@@ -24,6 +24,9 @@ int SceneToRender = 0;
 bool RotateLight = true;
 vec3 LightColor = { 1.0, 0.449, 0.001 };
 
+u32 LinkDrawCount = 0;
+bool RenderMap = false;
+
 FORCE_INLINE void Display()
 {	
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FORMAT_LIGHT0);
@@ -37,9 +40,16 @@ FORCE_INLINE void Display()
 		glScalef(0.75, 0.75, 0.75);
 		
 		YoungLinkDraw();
+
+		for (u32 i = 0; i < LinkDrawCount; i++)
+		{
+			glTranslatef(2.0, 0.0, 0.0);
+			YoungLinkDraw();
+		}
+		
 	glPopMatrix(1);
 
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0);
+//	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0);
 
 	glPushMatrix();
 		glTranslatef(0.0, -2.0, 0.0);
@@ -95,6 +105,11 @@ void PollKeyEvents()
 		}		
 	}
 	if (KeysDown & KEY_B) RotateLight = !RotateLight;
+
+	if (KeysDown & KEY_X) LinkDrawCount++;
+	if (KeysDown & KEY_Y && LinkDrawCount > 0) LinkDrawCount--;
+	if (KeysDown & KEY_SELECT) RenderMap = !RenderMap;
+
 	if (KeysHeld & KEY_START) exit(0);
 }
 
@@ -143,9 +158,10 @@ int main()
 
 	vramSetBankA(VRAM_A_TEXTURE);
 	vramSetBankB(VRAM_B_TEXTURE);
-//	vramSetBankD(VRAM_D_TEXTURE);
+	vramSetBankD(VRAM_D_TEXTURE);
 	
-	Textures[0] = LoadTexture(TEXTURE_SIZE_32, (u8*)Texkokiri_forest_minimap_pcx);
+//	LoadAlpha = true;
+	Textures[0] = LoadTexture(TEXTURE_SIZE_64, (u8*)Texkokiri_forest_minimap_pcx);
 	YoungLinkLoadTextures();
 	TempleofTimeLoadTextures();
 		
@@ -183,6 +199,8 @@ int main()
 	EngineLoadAudio(MOD_ZELDA);
 //	EnginePlayAudio(MOD_ZELDA);
 
+	f32 x = 22;
+
 	unsigned int Time = 0;
 	while(1) 
 	{	
@@ -191,18 +209,17 @@ int main()
 		if (RotateLight)
 			Time++;
 		glLoadIdentity();
-		
-		
-
-		
 
 		vec3 LightPos = { -(10.0 * SinF(Time)), -8.0, -(8.0 * CosF(Time)) };
 		Normalize3P(&LightPos);
 		glLight(0, RGB15(floattov10(LightColor.x), floattov10(LightColor.y), floattov10(LightColor.z)), floattov10(LightPos.x), floattov10(LightPos.y), floattov10(LightPos.z));	
 
-		
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(70, 256.0 / 192.0, 0.1, 1000.0);
 		UpdateCamera();
 		UpdateLink();
+		glMatrixMode(GL_MODELVIEW);		
 	//	Camera();
 		Display();
 
@@ -216,37 +233,43 @@ int main()
 		glMatrixMode(GL_MODELVIEW);
 		Camera();
 		Display();
-
-		glLoadIdentity();
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, 255, 191, 0, -10.0, 10.0);
-		glMatrixMode(GL_MODELVIEW);
-		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-		gluLookAt(0.0, 0.0, 1.0,
-			  	  0.0, 0.0, 0.0,
-			  	  0.0, 1.0, 0.0);
-		glPushMatrix();
-		
-		glScalef(9.6, 6.2, 2.0);
-		glColor3f(0.2, 1.0, 0.2);
-		glBindTexture(GL_TEXTURE_2D, Textures[0]);
-		glBegin(GL_QUADS);
-		{
-			
-			glTexCoord2f(0.0, 0.0);
-			glVertex3f(0.0, 0.0, 0.0);
-			
-			glTexCoord2f(1.0, 0.0);
-			glVertex3f(10.0, 0.0, 0.0);
-			glTexCoord2f(1.0, 1.0);
-			glVertex3f(10.0, 10.0, 0.0);
-			glTexCoord2f(0.0, 1.0);
-			glVertex3f(0.0, 10.0, 0.0);
-		}
-		glEnd();
-		glPopMatrix(1);
 		*/
+
+		if (RenderMap)
+		{
+			glLoadIdentity();
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(0, 255, 191, 0, -10.0, 10.0);
+			glMatrixMode(GL_MODELVIEW);
+			glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+			gluLookAt(0.0, 0.0, 1.0,
+					0.0, 0.0, 0.0,
+					0.0, 1.0, 0.0);
+			glPushMatrix();
+			
+			glScalef(9.6, 6.2, 2.0);
+			glColor3f(0.2, 1.0, 0.2);
+			glBindTexture(GL_TEXTURE_2D, Textures[0]);
+			glBegin(GL_QUADS);
+			{			
+				glTexCoord2f(1.0, 1.0);
+				glVertex3f(0.0, 0.0, 0.0);
+				
+				glTexCoord2f(0.0, 1.0);
+				glVertex3f(10.0, 0.0, 0.0);
+
+				glTexCoord2f(0.0, 0.0);
+				glVertex3f(10.0, 10.0, 0.0);
+				
+				
+				glTexCoord2f(1.0, 0.0);
+				glVertex3f(0.0, 10.0, 0.0);
+			}
+			glEnd();
+			glPopMatrix(1);
+		}		
+		
 		glGetInt(GL_GET_VERTEX_RAM_COUNT, &vrc);
 		glGetInt(GL_GET_POLYGON_RAM_COUNT, &prc);
 		
@@ -260,7 +283,11 @@ int main()
 		else if (SceneToRender == 1)
 			printf("\x1b[6;3H Scene: Kokiri Forest");
 
-		
+		printf("\x1b[8;1H A = chnage scene");
+		printf("\x1b[9;1H B = rotate light");
+		printf("\x1b[10;1H X/Y = add/sub Links");
+		printf("\x1b[11;1H select = map");
+
 		glFlush(0);		
 	}
 

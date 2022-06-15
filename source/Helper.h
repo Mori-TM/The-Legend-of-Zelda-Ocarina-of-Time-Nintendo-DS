@@ -1,5 +1,7 @@
 typedef int32_t f32;
 
+#define	fto32(n)   ((int)((n) * (1 << 12)))
+
 u32 KeysDown;
 u32 KeysHeld;
 touchPosition Touch;
@@ -48,6 +50,7 @@ FORCE_INLINE void glScaleV(vec3* Scale)
 	glTranslatef(Scale->x, Scale->y, Scale->z);
 }
 
+bool LoadAlpha = false;
 int LoadTexture(int Size, u8* Image)
 {
 	int Texture;
@@ -59,8 +62,13 @@ int LoadTexture(int Size, u8* Image)
 	glGenTextures(1, &Texture);
 	glBindTexture(0, Texture);
 
-	glTexImage2D(0, 0, GL_RGB, Size, Size, 0, TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T, pcx.image.data8);
+	if (LoadAlpha)
+		glTexImage2D(0, 0, GL_RGBA, Size, Size, 0, TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T, pcx.image.data8);
+	else
+		glTexImage2D(0, 0, GL_RGB, Size, Size, 0, TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T, pcx.image.data8);
 	imageDestroy(&pcx);
+
+	LoadAlpha = false;
 
 	return Texture;
 }
