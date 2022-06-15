@@ -37,7 +37,7 @@ NITRO    :=
 # -Wregister -Wattributes
 #---------------------------------------------------------------------------------
 ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
-
+        #-S -fverbose-asm -Wall -O3
 CFLAGS   := -g -Wall -O3\
             -fomit-frame-pointer\
             -ffast-math\
