@@ -38,11 +38,11 @@ NITRO    :=
 #---------------------------------------------------------------------------------
 ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
         #-S -fverbose-asm -Wall -O3
-CFLAGS   := -g -Wall -O3\
+CFLAGS   := -g -Wall -O3 -w\
             -fomit-frame-pointer\
             -ffast-math\
             $(ARCH) $(INCLUDE) -DARM9
-CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
+CXXFLAGS := $(CFLAGS)-fno-rtti -fno-exceptions
 ASFLAGS  := -g $(ARCH)
 LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 

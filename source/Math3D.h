@@ -1,3 +1,4 @@
+/*
 FORCE_INLINE float SinF(float angle)
 {
 	int32 s = sinLerp((short)(angle * DEGREES_IN_CIRCLE / 360));
@@ -26,41 +27,58 @@ FORCE_INLINE float DivF(float a, float b)
 {
 	return f32tofloat(divf32(floattof32(a), floattof32(b)));
 }
+*/
+FORCE_INLINE f32 sqrtf32(f32 Val)
+{
+	return sqrtf32(Val.Fixed);
+}
+
+FORCE_INLINE f32 sinf32(f32 Angle)
+{
+	return (s32)sinLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
+}
+
+FORCE_INLINE f32 cosf32(f32 Angle)
+{
+	return (s32)cosLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
+}
 
 //vector
 typedef struct
 {
-	float x;
-	float y;
+	f32 x;
+	f32 y;
 } vec2;
 
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+	f32 x;
+	f32 y;
+	f32 z;
 } vec3;
 
 typedef struct
 {
-	float x;
-	float y;
-	float z;
-	float w;
+	f32 x;
+	f32 y;
+	f32 z;
+	f32 w;
 } vec4;
 
-float FastInverseSqrt(float number)
+f32 FastInverseSqrt(f32 number)
 {
 	long i;
-	float x2, y;
+	float x2;
+	float y;
 	const float threehalfs = 1.5f;
+	const float Num = number.Float();
 
-	x2 = MulF(number, 0.5f);
-	y = number;
+	x2 = Num * 0.5f;
+	y = Num;
 	i = *(long*)&y;              // evil floating point bit level hacking
 	i = 0x5f3759df - (i >> 1);   // what the fuck? 
 	y = *(float*)&i;
-	y = MulF(y, (threehalfs - (MulF(MulF(x2, y), y))));   // 1st iteration
+	y = y * (threehalfs - (x2 * y * y));   // 1st iteration
 //	y = y * (threehalfs - (x2 * y * y));   // 2nd iteration, this can be removed - it's for more accuracy
 
 	return y;
@@ -68,7 +86,7 @@ float FastInverseSqrt(float number)
 
 vec2 Normalize2(vec2 v)
 {
-	register float length = FastInverseSqrt(v.x * v.x + v.y * v.y);
+	register f32 length = FastInverseSqrt(v.x * v.x + v.y * v.y);
 	v.x *= length;
 	v.y *= length;
 	return v;
@@ -76,7 +94,7 @@ vec2 Normalize2(vec2 v)
 
 vec3 Normalize3(vec3 v)
 {
-	register float length = FastInverseSqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	register f32 length = FastInverseSqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	v.x *= length;
 	v.y *= length;
 	v.z *= length;
@@ -85,7 +103,7 @@ vec3 Normalize3(vec3 v)
 
 vec4 Normalize4(vec4 v)
 {
-	register float length = FastInverseSqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
+	register f32 length = FastInverseSqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
 	v.x *= length;
 	v.y *= length;
 	v.z *= length;
@@ -95,14 +113,14 @@ vec4 Normalize4(vec4 v)
 
 void Normalize2P(vec2* v)
 {
-	register float length = FastInverseSqrt(v->x * v->x + v->y * v->y);
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y);
 	v->x *= length;
 	v->y *= length;
 }
 
 void Normalize3P(vec3* v)
 {
-	register float length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
 	v->x *= length;
 	v->y *= length;
 	v->z *= length;
@@ -110,7 +128,7 @@ void Normalize3P(vec3* v)
 
 void Normalize4P(vec4* v)
 {
-	register float length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w);
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w);
 	v->x *= length;
 	v->y *= length;
 	v->z *= length;
@@ -126,12 +144,12 @@ FORCE_INLINE vec3 Cross3P(vec3* a, vec3* b)
 	return r;
 }
 
-FORCE_INLINE float Dot2P(vec2* a, vec2* b)
+FORCE_INLINE f32 Dot2P(vec2* a, vec2* b)
 {
 	return a->x * b->x + a->y * b->y;
 }
 
-FORCE_INLINE float Dot3P(vec3* a, vec3* b)
+FORCE_INLINE f32 Dot3P(vec3* a, vec3* b)
 {
 	return a->x * b->x + a->y * b->y + a->z * b->z;
 }
@@ -254,12 +272,12 @@ FORCE_INLINE vec3 Cross3(vec3 a, vec3 b)
 	return r;
 }
 
-FORCE_INLINE float Dot2(vec2 a, vec2 b)
+FORCE_INLINE f32 Dot2(vec2 a, vec2 b)
 {
 	return a.x * b.x + a.y * b.y;
 }
 
-FORCE_INLINE float Dot3(vec3 a, vec3 b)
+FORCE_INLINE f32 Dot3(vec3 a, vec3 b)
 {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -372,108 +390,108 @@ FORCE_INLINE vec4 Div4(vec4 a, vec4 b)
 	return r;
 }
 
-FORCE_INLINE float Length3(vec3 v)
+FORCE_INLINE f32 Length3(vec3 v)
 {
-	return SqrtfF(v.x * v.x + v.y * v.y + v.z * v.z);
+	return sqrtf32(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-FORCE_INLINE float Length3P(vec3* v)
+FORCE_INLINE f32 Length3P(vec3* v)
 {
-	return SqrtfF((v->x * v->x) + (v->y * v->y) + (v->z * v->z));
+	return sqrtf32((v->x * v->x) + (v->y * v->y) + (v->z * v->z));
 }
 
 FORCE_INLINE vec2 Reflect2(vec2* v, vec2* n)
 {
 	vec2 r;
-	r.x = v->x - 2 * Dot2P(v, n) * n->x;
-	r.y = v->y - 2 * Dot2P(v, n) * n->y;
+	r.x = v->x - Dot2P(v, n) * n->x * 2.0f;
+	r.y = v->y - Dot2P(v, n) * n->y * 2.0f;
 	return r;
 }
 
 FORCE_INLINE vec3 Reflect3(vec3* v, vec3* n)
 {
 	vec3 r;
-	r.x = v->x - 2 * Dot3P(v, n) * n->x;
-	r.y = v->y - 2 * Dot3P(v, n) * n->y;
-	r.z = v->z - 2 * Dot3P(v, n) * n->z;
+	r.x = v->x - Dot3P(v, n) * n->x * 2.0f;
+	r.y = v->y - Dot3P(v, n) * n->y * 2.0f;
+	r.z = v->z - Dot3P(v, n) * n->z * 2.0f;
 	return r;
 }
 
-float GetDistanceVec2(vec2* a, vec2* b)
+f32 GetDistanceVec2(vec2* a, vec2* b)
 {
-	register float DX = a->x - b->x;
-	register float DY = a->y - b->y;
+	register f32 DX = a->x - b->x;
+	register f32 DY = a->y - b->y;
 
 	DX *= DX;
 	DY *= DY;
 
-	return SqrtfF(DX + DY);
+	return sqrtf32(DX + DY);
 }
 
-float GetDistanceVec3(vec3 a, vec3 b)
+f32 GetDistanceVec3(vec3 a, vec3 b)
 {
-	register float DX = a.x - b.x;
-	register float DY = a.y - b.y;
-	register float DZ = a.z - b.z;
-
-	DX *= DX;
-	DY *= DY;
-	DZ *= DZ;
-
-	return SqrtfF(DX + DY + DZ);
-}
-
-float GetDistanceVec3P(vec3* a, vec3* b)
-{
-	register float DX = a->x - b->x;
-	register float DY = a->y - b->y;
-	register float DZ = a->z - b->z;
+	register f32 DX = a.x - b.x;
+	register f32 DY = a.y - b.y;
+	register f32 DZ = a.z - b.z;
 
 	DX *= DX;
 	DY *= DY;
 	DZ *= DZ;
 
-	return SqrtfF(DX + DY + DZ);
+	return sqrtf32(DX + DY + DZ);
 }
 
-FORCE_INLINE vec2 Vec2(float x, float y)
+f32 GetDistanceVec3P(vec3* a, vec3* b)
+{
+	register f32 DX = a->x - b->x;
+	register f32 DY = a->y - b->y;
+	register f32 DZ = a->z - b->z;
+
+	DX *= DX;
+	DY *= DY;
+	DZ *= DZ;
+
+	return sqrtf32(DX + DY + DZ);
+}
+
+FORCE_INLINE vec2 Vec2(f32 x, f32 y)
 {
 	vec2 r = { x, y };
 	return r;
 }
 
-FORCE_INLINE vec3 Vec3(float x, float y, float z)
+FORCE_INLINE vec3 Vec3(f32 x, f32 y, f32 z)
 {
 	vec3 r = { x, y, z };
 	return r;
 }
 
-FORCE_INLINE vec4 Vec4(float x, float y, float z, float w)
+FORCE_INLINE vec4 Vec4(f32 x, f32 y, f32 z, f32 w)
 {
 	vec4 r = { x, y, z, w };
 	return r;
 }
 
-FORCE_INLINE vec2 Vec2f(float x)
+FORCE_INLINE vec2 Vec2f(f32 x)
 {
 	vec2 r = { x, x };
 	return r;
 }
 
-FORCE_INLINE vec3 Vec3f(float x)
+FORCE_INLINE vec3 Vec3f(f32 x)
 {
 	vec3 r = { x, x, x };
 	return r;
 }
 
-FORCE_INLINE vec4 Vec4f(float x)
+FORCE_INLINE vec4 Vec4f(f32 x)
 {
 	vec4 r = { x, x, x, x };
 	return r;
 }
 
 //helper
-FORCE_INLINE float ToRadians(float Angle)
+FORCE_INLINE f32 ToRadians(f32 Angle)
 {
-	return 0.01745329251 * Angle;
+	return Angle * 0.01745329251f;
 }
