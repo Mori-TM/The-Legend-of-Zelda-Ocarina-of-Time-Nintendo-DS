@@ -1,3 +1,5 @@
+#define NO_HARDWARE_ACCELERATION
+
 class f32
 {
 public:
@@ -70,54 +72,90 @@ public:
 	}
 
 	//for the ds use hardware assisted math func like mulf32() or divf32()
+
+#ifdef NO_HARDWARE_ACCELERATION
+	FORCE_INLINE void operator*=(f32 const& n)
+	{
+		Fixed = (s32)((s64(Fixed) * s64(n.Fixed)) >> 12);
+	}
+
+	FORCE_INLINE void operator*=(float const& n)
+	{
+		Fixed = (s32)((s64(Fixed) * s64(f32(n).Fixed)) >> 12);
+	}
+
+	FORCE_INLINE void operator/=(f32 const& n)
+	{
+		Fixed = (s32)((s64(Fixed) << 12) / s64(n.Fixed));
+	}
+
+	FORCE_INLINE void operator/=(float const& n)
+	{
+		Fixed = (s32)((s64(Fixed) << 12) / s64(f32(n).Fixed));
+	}
+
+
+	FORCE_INLINE f32 operator*(f32 const& n)
+	{
+		return (s32)((s64(Fixed) * s64(n.Fixed)) >> 12);
+	}
+
+	FORCE_INLINE f32 operator*(float const& n)
+	{
+		return (s32)((s64(Fixed) * s64(f32(n).Fixed)) >> 12);
+	}
+
+	FORCE_INLINE f32 operator/(f32 const& n)
+	{
+		return (s32)((s64(Fixed) << 12) / s64(n.Fixed));
+	}
+
+	FORCE_INLINE f32 operator/(float const& n)
+	{
+		return (s32)((s64(Fixed) << 12) / s64(f32(n).Fixed));
+	}
+#else
 	FORCE_INLINE void operator*=(f32 const& n)
 	{
 		Fixed = mulf32(Fixed, n.Fixed);
-	//	Fixed = (s32)((s64(Fixed) * s64(n.Fixed)) >> 12);
 	}
 
 	FORCE_INLINE void operator*=(float const& n)
 	{
 		Fixed = mulf32(Fixed, f32(n).Fixed);
-	//	Fixed = (s32)((s64(Fixed) * s64(f32(n).Fixed)) >> 12);
 	}
 
 	FORCE_INLINE void operator/=(f32 const& n)
 	{
 		Fixed = divf32(Fixed, n.Fixed);
-	//	Fixed = (s32)((s64(Fixed) << 12) / s64(n.Fixed));
 	}
 
 	FORCE_INLINE void operator/=(float const& n)
 	{
 		Fixed = divf32(Fixed, f32(n).Fixed);
-	//	Fixed = (s32)((s64(Fixed) << 12) / s64(f32(n).Fixed));
 	}
 
 
 	FORCE_INLINE f32 operator*(f32 const& n)
 	{
 		return mulf32(Fixed, n.Fixed);
-	//	return (s32)((s64(Fixed) * s64(n.Fixed)) >> 12);
 	}
 
 	FORCE_INLINE f32 operator*(float const& n)
 	{
 		return mulf32(Fixed, f32(n).Fixed);
-	//	return (s32)((s64(Fixed) * s64(f32(n).Fixed)) >> 12);
 	}
 
 	FORCE_INLINE f32 operator/(f32 const& n)
 	{
 		return divf32(Fixed, n.Fixed);
-	//	return (s32)((s64(Fixed) << 12) / s64(n.Fixed));
 	}
 
 	FORCE_INLINE f32 operator/(float const& n)
 	{
 		return divf32(Fixed, f32(n).Fixed);
-	//	return (s32)((s64(Fixed) << 12) / s64(f32(n).Fixed));
 	}
+#endif	
 
 	FORCE_INLINE f32 operator-()
 	{

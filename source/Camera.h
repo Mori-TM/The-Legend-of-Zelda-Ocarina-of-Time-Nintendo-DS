@@ -1,64 +1,132 @@
-f32 CameraZoom = 5.0f;
+const vec3 CameraPosOff = { 0.0, 3.0, 5.0 };
+vec3 CameraPos = { 0.0, 2.5, 8.0 };
+vec3 CameraDir = { 0.0, 0.0,-1.0 };
+vec3 CameraUp = { 0.0, 1.0, 0.0 };
+vec3 PlayerPos = { 0.0, -2.0, 0.0 };
+vec3 PlayerDir = { 0.0, 0.0,-1.0 };
+f32 PlayerRotY = 0.0;
+f32 FinalPlayerRotY = 0.0;
 
-vec3 CameraPos = { 0.0f, 2.5f, 18.0f };
-vec3 CameraLookAt = { 0.0f, 0.0f, 0.0f };
-vec3 CameraUp = { 0.0f, 1.0f, 0.0f };
-vec3 CameraDir = { 0.0f, 0.0f, 0.0f };
+f32 PlayerCameraDist = 0.0;
 
-int CameraRotX = 45.0f;
-int CameraRotY = 45.0f;
+bool ChangedPlayerDir = false;
 
-vec3 LinkPos = { 0.0f, -2.0f, 22.0f };
-vec3 LinkRot = { 0.0f, 0.0f, 0.0f };
-
-f32 Distance = 5.5f;
-f32 Speed = 0.11f;
-f32 LinkCamDist = 0.0f;
-
-f32 CamSpeed = 0.115f;
-
-
-FORCE_INLINE void UpdateCamera()
+void UpdatePlayer()
 {
-	CameraLookAt = Vec3(LinkPos.x, LinkPos.y + 1.0f, LinkPos.z);
-	LinkCamDist = GetDistanceVec3P(&LinkPos, &CameraPos);
+	f32 Speed = DeltaTime * 1.5;
+	CameraDir = Mul3(CameraDir, Vec3f(Speed));
 
-	CameraDir = Normalize3(Sub3(LinkPos, CameraPos));
+	f32 PrevPlayerY = PlayerPos.y;
+	f32 PrevCameraY = CameraPos.y;
 
-	if (LinkCamDist > Distance * 1.4f)
+
+	if (KeysHeld & KEY_RIGHT)
 	{
-		CamSpeed = 0.24f;
-		CameraPos = Add3(CameraPos, Mul3(CameraDir, Vec3f(CamSpeed)));
-	}		
-	else if (LinkCamDist < Distance * 1.4f && LinkCamDist > Distance)
-	{
-		CamSpeed = 0.115f;
-		CameraPos = Add3(CameraPos, Mul3(CameraDir, Vec3f(CamSpeed)));
+		FinalPlayerRotY = 90.0;
+
+		PlayerDir = Cross3P(&CameraUp, &CameraDir);
+		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+
+		ChangedPlayerDir = true;
 	}
-		
+	if (KeysHeld & KEY_LEFT)
+	{
+		FinalPlayerRotY = -90.0;
 
-	CameraPos.y = 2.0f;
-	gluLookAtV(&CameraPos,
-		&CameraLookAt,
-		&CameraUp);
+		PlayerDir = Cross3P(&CameraUp, &CameraDir);
+		PlayerDir.x = -PlayerDir.x;
+		PlayerDir.y = -PlayerDir.y;
+		PlayerDir.z = -PlayerDir.z;
+
+		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+
+		ChangedPlayerDir = true;
+	}
+	if (KeysHeld & KEY_DOWN)
+	{
+		FinalPlayerRotY = 180.0;
+
+		PlayerDir = CameraDir;
+		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+
+		if (PlayerCameraDist < 5.8)
+			CameraPos = Add3P(&CameraPos, &PlayerDir);
+
+		ChangedPlayerDir = true;
+	}
+	if (KeysHeld & KEY_UP)
+	{
+		FinalPlayerRotY = 0.0;
+
+		PlayerDir.x = -CameraDir.x;
+		PlayerDir.y = -CameraDir.y;
+		PlayerDir.z = -CameraDir.z;
+		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+
+		if (PlayerCameraDist > 7.8)
+			CameraPos = Add3P(&CameraPos, &PlayerDir);
+
+		ChangedPlayerDir = true;
+	}
+
+	if (FinalPlayerRotY > 0.0)
+	{
+		if (PlayerRotY <= FinalPlayerRotY)
+			PlayerRotY += DeltaTime * 800.0;
+	}
+	else
+	{
+		if (PlayerRotY >= FinalPlayerRotY)
+			PlayerRotY -= DeltaTime * 800.0;
+	}
+
+	if (PlayerRotY >= f32(360.0))
+		PlayerRotY = 0.0;
+
+//	if (Key[SDL_SCANCODE_Q] && ChangedPlayerDir)
+//	{
+//		vec3 Dir = Div3(PlayerDir, Vec3f(Speed));
+//
+//		f32 AbsX = fabsf(Dir.x);
+//		f32 AbsZ = fabsf(Dir.z);
+//
+//		mat4 M = RotateYMat4(LoadMat4Identity(), ToRadians(PlayerRotY));
+//		M = TranslateMat4(M, PlayerPos);
+//		vec4 Pos = { CameraPos.x, CameraPos.y, CameraPos.z, 1.0 };
+//
+//		Pos = MultiplyVec4Mat4P(&Pos, &M);
+//		CameraPos.x = Pos.x;
+//		CameraPos.y = Pos.y;
+//		CameraPos.z = Pos.z;
+//
+//		ChangedPlayerDir = false;
+//		//	CameraPos = Mul3P(&CameraPos, &Dir);
+//	}
+
+//	vec3 Dir = Div3(PlayerDir, Vec3f(Speed));
+//	PrintVec3(&CameraPos);
+
+	PlayerPos.y = PrevPlayerY;
+	CameraPos.y = PrevCameraY;
 }
 
-FORCE_INLINE void UpdateLink()
+//stylus = mouse
+//D-Pad = wasd
+//L-Shoulder = Q
+void UpdateCamera()
 {
-	vec3 PrevPos = LinkPos;
+	PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
+	//	Uint8* Key = SDL_GetKeyboardState(NULL);
 
-	printf("\x1b[7;3H %f", LinkCamDist.Float());
 
-	CameraDir = Mul3(CameraDir, Vec3f(Speed + 0.13f));
-	if (KeysHeld & KEY_UP) { LinkPos = Add3P(&LinkPos, &CameraDir); }
-	if (KeysHeld & KEY_DOWN) { LinkPos = Sub3P(&LinkPos, &CameraDir); }
-	if (KeysHeld & KEY_LEFT) { LinkPos = Add3(LinkPos, Cross3P(&CameraUp, &CameraDir)); }
-	if (KeysHeld & KEY_RIGHT) { LinkPos = Sub3(LinkPos, Cross3P(&CameraUp, &CameraDir)); }
 
-	f32 NewDist = GetDistanceVec3P(&LinkPos, &CameraPos);
 
-	if (LinkCamDist <= 4.3f && NewDist < LinkCamDist)
-		LinkPos = PrevPos;
+	CameraDir = Sub3(CameraPos, PlayerPos);
+	Normalize3P(&CameraDir);
+	UpdatePlayer();
 
-	LinkPos.y = -2.0f;
+	PlayerPos.y += 1.0;
+	gluLookAtV(&CameraPos, &PlayerPos, &CameraUp);
+	PlayerPos.y -= 1.0;
+	//	CameraPos = Add3P(&CameraPosOff, &PlayerPos);
 }

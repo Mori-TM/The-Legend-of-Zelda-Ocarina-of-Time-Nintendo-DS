@@ -1,46 +1,30 @@
 /*
-FORCE_INLINE float SinF(float angle)
-{
-	int32 s = sinLerp((short)(angle * DEGREES_IN_CIRCLE / 360));
-
-	return f32tofloat(s);
-}
-
-FORCE_INLINE float CosF(float angle)
-{
-	int32 c = cosLerp((short)(angle * DEGREES_IN_CIRCLE / 360));
-
-	return f32tofloat(c);
-}
-
-FORCE_INLINE float SqrtfF(float val)
-{
-	return f32tofloat(sqrtf32(floattof32(val)));
-}
-
-FORCE_INLINE float MulF(float a, float b)
-{
-	return f32tofloat(mulf32(floattof32(a), floattof32(b)));
-}
-
-FORCE_INLINE float DivF(float a, float b)
-{
-	return f32tofloat(divf32(floattof32(a), floattof32(b)));
-}
+* TO-Do
+* (dont) use hardware normalize functions (its slower)
+* use hardware cross functions
 */
+
 FORCE_INLINE f32 sqrtf32(f32 Val)
 {
 	return sqrtf32(Val.Fixed);
 }
 
+#define DEGREES_IN_CIRCLEF32 (s32)134217728
+#define	FULL_360F32 (s32)1474560
+#define DEG_IN_CIR_DIVF32 (s32)372827
+
 FORCE_INLINE f32 sinf32(f32 Angle)
 {
-	return (s32)sinLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
+	return (s32)sinLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+//	return (s32)sinLerp((short)(Angle * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)).Fixed);
+//	return (s32)sinLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
 }
 
 FORCE_INLINE f32 cosf32(f32 Angle)
 {
-	return (s32)cosLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
+	return (s32)cosLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+//	return (s32)cosLerp((short)(Angle * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)).Fixed);
+//	return (s32)cosLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
 }
 
 //vector
@@ -120,6 +104,14 @@ void Normalize2P(vec2* v)
 
 void Normalize3P(vec3* v)
 {
+	//Hardware is slower
+	//	int32* i[3] =
+	//	{
+	//		&v->x.Fixed,
+	//		&v->y.Fixed,
+	//		&v->z.Fixed,
+	//	};
+	//	normalizef32(*i);
 	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
 	v->x *= length;
 	v->y *= length;

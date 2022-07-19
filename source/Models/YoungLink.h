@@ -1,3 +1,5 @@
+#include "LinkTex_pcx.h"
+
 u32 YoungLink[] =
 {
 	10441,
