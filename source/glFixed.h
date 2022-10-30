@@ -14,7 +14,7 @@ FORCE_INLINE void glRotatefx(f32 a, f32 x, f32 y, f32 z)
 }
 
 FORCE_INLINE void gluPerspectivefx(f32 Fov, f32 Aspect, f32 NearZ, f32 FarZ)
-{
+{ 
 	gluPerspectivef32(Fov.Fixed, Aspect.Fixed, NearZ.Fixed, FarZ.Fixed);
 }
 

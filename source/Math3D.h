@@ -27,6 +27,61 @@ FORCE_INLINE f32 cosf32(f32 Angle)
 //	return (s32)cosLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
 }
 
+FORCE_INLINE f32 asinf32(f32 Angle)
+{
+	return (s32)asinLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+}
+
+FORCE_INLINE f32 acosf32(f32 Angle)
+{
+	return (s32)acosLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+}
+/*
+FORCE_INLINE f32 atan2f32(f32 x, f32 y)
+{
+	f32 v = asinf32(x) /acosf32(y);
+	return (v * v);
+}
+*/
+
+float fabsff(float x)
+{
+	if (x < 0.0)
+		return -x;
+
+	return x;
+}
+
+f32 fabsf32(f32 x)
+{
+	if (x < 0.0)
+		return -x;
+
+	return x;
+}
+
+f32 atan2f32( float y, float x )
+{
+    static const uint32_t sign_mask = 0x80000000;
+    static const float b = 0.596227f;
+
+    // Extract the sign bits
+    uint32_t ux_s  = sign_mask & (uint32_t &)x;
+    uint32_t uy_s  = sign_mask & (uint32_t &)y;
+
+    // Determine the quadrant offset
+    float q = (float)( ( ~ux_s & uy_s ) >> 29 | ux_s >> 30 ); 
+
+    // Calculate the arctangent in the first quadrant
+    float bxy_a = fabsff( b * x * y );
+    float num = bxy_a + y * y;
+    float atan_1q =  num / ( x * x + bxy_a + num );
+
+    // Translate it to the proper quadrant
+    uint32_t uatan_2q = (ux_s ^ uy_s) | (uint32_t &)atan_1q;
+    return q + (float &)uatan_2q;
+} 
+
 //vector
 typedef struct
 {
@@ -63,9 +118,33 @@ f32 FastInverseSqrt(f32 number)
 	i = 0x5f3759df - (i >> 1);   // what the fuck? 
 	y = *(float*)&i;
 	y = y * (threehalfs - (x2 * y * y));   // 1st iteration
-//	y = y * (threehalfs - (x2 * y * y));   // 2nd iteration, this can be removed - it's for more accuracy
+	y = y * (threehalfs - (x2 * y * y));   // 2nd iteration, this can be removed - it's for more accuracy
 
 	return y;
+}
+
+void Normalize2P(vec2* v)
+{
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y);
+	v->x *= length;
+	v->y *= length;
+}
+
+void Normalize4P(vec4* v)
+{
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w);
+	v->x *= length;
+	v->y *= length;
+	v->z *= length;
+	v->w *= length;
+}
+
+void Normalize3P(vec3* v)
+{
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+	v->x *= length;
+	v->y *= length;
+	v->z *= length;
 }
 
 vec2 Normalize2(vec2 v)
@@ -93,47 +172,6 @@ vec4 Normalize4(vec4 v)
 	v.z *= length;
 	v.w *= length;
 	return v;
-}
-
-void Normalize2P(vec2* v)
-{
-	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y);
-	v->x *= length;
-	v->y *= length;
-}
-
-void Normalize3P(vec3* v)
-{
-	//Hardware is slower
-	//	int32* i[3] =
-	//	{
-	//		&v->x.Fixed,
-	//		&v->y.Fixed,
-	//		&v->z.Fixed,
-	//	};
-	//	normalizef32(*i);
-	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
-	v->x *= length;
-	v->y *= length;
-	v->z *= length;
-}
-
-void Normalize4P(vec4* v)
-{
-	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w);
-	v->x *= length;
-	v->y *= length;
-	v->z *= length;
-	v->w *= length;
-}
-
-FORCE_INLINE vec3 Cross3P(vec3* a, vec3* b)
-{
-	vec3 r;
-	r.x = a->y * b->z - a->z * b->y;
-	r.y = a->z * b->x - a->x * b->z;
-	r.z = a->x * b->y - a->y * b->x;
-	return r;
 }
 
 FORCE_INLINE f32 Dot2P(vec2* a, vec2* b)
@@ -254,132 +292,88 @@ FORCE_INLINE vec4 Div4P(vec4* a, vec4* b)
 	return r;
 }
 
+FORCE_INLINE vec3 Cross3P(vec3* a, vec3* b)
+{
+	vec3 r;
+	r.x = a->y * b->z - a->z * b->y;
+	r.y = a->z * b->x - a->x * b->z;
+	r.z = a->x * b->y - a->y * b->x;
+	return r;
+}
 
 FORCE_INLINE vec3 Cross3(vec3 a, vec3 b)
 {
-	vec3 r;
-	r.x = a.y * b.z - a.z * b.y;
-	r.y = a.z * b.x - a.x * b.z;
-	r.z = a.x * b.y - a.y * b.x;
-	return r;
+	return Cross3P(&a, &b);
 }
 
 FORCE_INLINE f32 Dot2(vec2 a, vec2 b)
 {
-	return a.x * b.x + a.y * b.y;
+	return Dot2P(&a, &b);
 }
 
 FORCE_INLINE f32 Dot3(vec3 a, vec3 b)
 {
-	return a.x * b.x + a.y * b.y + a.z * b.z;
+	return Dot3P(&a, &b);
 }
 
 FORCE_INLINE vec2 Add2(vec2 a, vec2 b)
 {
-	vec2 r;
-	r.x = a.x + b.x;
-	r.y = a.y + b.y;
-	return r;
+	return Add2P(&a, &b);
 }
 
 FORCE_INLINE vec2 Sub2(vec2 a, vec2 b)
 {
-	vec2 r;
-	r.x = a.x - b.x;
-	r.y = a.y - b.y;
-	return r;
+	return Sub2P(&a, &b);
 }
 
 FORCE_INLINE vec2 Mul2(vec2 a, vec2 b)
 {
-	vec2 r;
-	r.x = a.x * b.x;
-	r.y = a.y * b.y;
-	return r;
+	return Mul2P(&a, &b);
 }
 
 FORCE_INLINE vec2 Div2(vec2 a, vec2 b)
 {
-	vec2 r;
-	r.x = a.x / b.x;
-	r.y = a.y / b.y;
-	return r;
+	return Div2P(&a, &b);
 }
 
 FORCE_INLINE vec3 Add3(vec3 a, vec3 b)
 {
-	vec3 r;
-	r.x = a.x + b.x;
-	r.y = a.y + b.y;
-	r.z = a.z + b.z;
-	return r;
+	return Add3P(&a, &b);
 }
 
 FORCE_INLINE vec3 Sub3(vec3 a, vec3 b)
 {
-	vec3 r;
-	r.x = a.x - b.x;
-	r.y = a.y - b.y;
-	r.z = a.z - b.z;
-	return r;
+	return Sub3P(&a, &b);
 }
 
 FORCE_INLINE vec3 Mul3(vec3 a, vec3 b)
 {
-	vec3 r;
-	r.x = a.x * b.x;
-	r.y = a.y * b.y;
-	r.z = a.z * b.z;
-	return r;
+	return Mul3P(&a, &b);
 }
 
 FORCE_INLINE vec3 Div3(vec3 a, vec3 b)
 {
-	vec3 r;
-	r.x = a.x / b.x;
-	r.y = a.y / b.y;
-	r.z = a.z / b.z;
-	return r;
+	return Div3P(&a, &b);
 }
 
 FORCE_INLINE vec4 Add4(vec4 a, vec4 b)
 {
-	vec4 r;
-	r.x = a.x + b.x;
-	r.y = a.y + b.y;
-	r.z = a.z + b.z;
-	r.w = a.w + b.w;
-	return r;
+	return Add4P(&a, &b);
 }
 
 FORCE_INLINE vec4 Sub4(vec4 a, vec4 b)
 {
-	vec4 r;
-	r.x = a.x - b.x;
-	r.y = a.y - b.y;
-	r.z = a.z - b.z;
-	r.w = a.w - b.w;
-	return r;
+	return Sub4P(&a, &b);
 }
 
 FORCE_INLINE vec4 Mul4(vec4 a, vec4 b)
 {
-	vec4 r;
-	r.x = a.x * b.x;
-	r.y = a.y * b.y;
-	r.z = a.z * b.z;
-	r.w = a.w * b.w;
-	return r;
+	return Mul4P(&a, &b);
 }
 
 FORCE_INLINE vec4 Div4(vec4 a, vec4 b)
 {
-	vec4 r;
-	r.x = a.x / b.x;
-	r.y = a.y / b.y;
-	r.z = a.z / b.z;
-	r.w = a.w / b.w;
-	return r;
+	return Div4P(&a, &b);
 }
 
 FORCE_INLINE f32 Length3(vec3 v)

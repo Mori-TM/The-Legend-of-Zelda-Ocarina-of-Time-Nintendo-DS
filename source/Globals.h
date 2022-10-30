@@ -8,3 +8,4 @@ u32 LinkDrawCount = 0;
 bool RenderMap = true;
 
 int Ticks = 0;
+f32 Ticksf32 = 0.0;

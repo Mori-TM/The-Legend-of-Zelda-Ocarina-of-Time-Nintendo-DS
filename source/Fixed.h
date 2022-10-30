@@ -1,5 +1,3 @@
-#define NO_HARDWARE_ACCELERATION
-
 class f32
 {
 public:

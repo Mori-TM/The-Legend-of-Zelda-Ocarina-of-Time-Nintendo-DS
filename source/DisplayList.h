@@ -33,6 +33,33 @@ void SetNormalToList(u32* List, u32 Index, vec3 Norm)
 	List[Index] = NORMAL_PACK(f32tov10(Norm.x.Fixed), f32tov10(Norm.y.Fixed), f32tov10(Norm.z.Fixed));
 }
 
+#define t16tof32(n) ((float)t16toint(n) * 4096.0f)
+
+vec2 GetTexCoordFromList(u32* List, u32 Index)
+{
+	Index++;
+	Index *= 5;
+	Index -= 2;
+
+	t16 x = (List[Index] & 0xFFFF);
+	t16 y = (List[Index] >> 16) & 0xFFFF; // & 0xFFFF opt
+
+	vec2 TexCoord;
+	TexCoord.x = (s32)t16tof32(x);
+	TexCoord.y = (s32)t16tof32(y);
+
+	return TexCoord;
+}
+
+void SetTexCoordToList(u32* List, u32 Index, vec2 TexCoord)
+{
+	Index++;
+	Index *= 5;
+	Index -= 2;
+
+	List[Index] = TEXTURE_PACK(f32tot16(TexCoord.x.Fixed), f32tot16(TexCoord.y.Fixed));
+}
+
 vec3 GetVertexFromList(u32* List, u32 Index)
 {
 	Index++;

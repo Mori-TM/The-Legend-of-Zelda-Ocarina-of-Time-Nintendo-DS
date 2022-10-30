@@ -70,7 +70,7 @@ f32 LastTime = 0.0;
 
 f32 GetDeltaTime()
 {
-	f32 CurrentTime = f32((s32)Ticks) / 1000.0;
+	f32 CurrentTime = f32((s32)Ticks);
 	DeltaTime = CurrentTime - LastTime;
 	LastTime = CurrentTime;
 
