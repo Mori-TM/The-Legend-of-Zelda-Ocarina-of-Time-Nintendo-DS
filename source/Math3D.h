@@ -3,47 +3,6 @@
 * (dont) use hardware normalize functions (its slower)
 * use hardware cross functions
 */
-
-FORCE_INLINE f32 sqrtf32(f32 Val)
-{
-	return sqrtf32(Val.Fixed);
-}
-
-#define DEGREES_IN_CIRCLEF32 (s32)134217728
-#define	FULL_360F32 (s32)1474560
-#define DEG_IN_CIR_DIVF32 (s32)372827
-
-FORCE_INLINE f32 sinf32(f32 Angle)
-{
-	return (s32)sinLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
-//	return (s32)sinLerp((short)(Angle * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)).Fixed);
-//	return (s32)sinLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
-}
-
-FORCE_INLINE f32 cosf32(f32 Angle)
-{
-	return (s32)cosLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
-//	return (s32)cosLerp((short)(Angle * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)).Fixed);
-//	return (s32)cosLerp((short)(Angle.Float() * DEGREES_IN_CIRCLE / 360));
-}
-
-FORCE_INLINE f32 asinf32(f32 Angle)
-{
-	return (s32)asinLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
-}
-
-FORCE_INLINE f32 acosf32(f32 Angle)
-{
-	return (s32)acosLerp((short)(Angle * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
-}
-/*
-FORCE_INLINE f32 atan2f32(f32 x, f32 y)
-{
-	f32 v = asinf32(x) /acosf32(y);
-	return (v * v);
-}
-*/
-
 float fabsff(float x)
 {
 	if (x < 0.0)
@@ -59,6 +18,46 @@ f32 fabsf32(f32 x)
 
 	return x;
 }
+
+FORCE_INLINE f32 sqrtf32(f32 Val)
+{
+	return sqrtf32(Val.Fixed);
+}
+
+#define DEGREES_IN_CIRCLEF32 (s32)134217728
+#define	FULL_360F32 (s32)1474560
+#define DEG_IN_CIR_DIVF32 (s32)372827
+
+FORCE_INLINE f32 sinf32(f32 Ane)
+{
+	return (s32)sinLerp((short)(Ane * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+//	return (s32)sinLerp((short)(Ane * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)).Fixed);
+//	return (s32)sinLerp((short)(Ane.Float() * DEGREES_IN_CIRCLE / 360));
+}
+
+FORCE_INLINE f32 cosf32(f32 Ane)
+{
+	return (s32)cosLerp((short)(Ane * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+//	return (s32)cosLerp((short)(Ane * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)).Fixed);
+//	return (s32)cosLerp((short)(Ane.Float() * DEGREES_IN_CIRCLE / 360));
+}
+
+FORCE_INLINE f32 asinf32(f32 Ane)
+{
+	return (s32)asinLerp((short)(Ane * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+}
+
+FORCE_INLINE f32 acosf32(f32 Ane)
+{
+	return (s32)acosLerp((short)(Ane * f32(DEGREES_IN_CIRCLEF32) / f32(FULL_360F32)).Fixed);
+}
+/*
+FORCE_INLINE f32 atan2f32(f32 x, f32 y)
+{
+	f32 v = asinf32(x) /acosf32(y);
+	return (v * v);
+}
+*/
 
 f32 atan2f32( float y, float x )
 {
@@ -130,6 +129,14 @@ void Normalize2P(vec2* v)
 	v->y *= length;
 }
 
+void Normalize3P(vec3* v)
+{
+	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+	v->x *= length;
+	v->y *= length;
+	v->z *= length;
+}
+
 void Normalize4P(vec4* v)
 {
 	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z + v->w * v->w);
@@ -139,39 +146,31 @@ void Normalize4P(vec4* v)
 	v->w *= length;
 }
 
-void Normalize3P(vec3* v)
-{
-	register f32 length = FastInverseSqrt(v->x * v->x + v->y * v->y + v->z * v->z);
-	v->x *= length;
-	v->y *= length;
-	v->z *= length;
-}
-
 vec2 Normalize2(vec2 v)
 {
-	register f32 length = FastInverseSqrt(v.x * v.x + v.y * v.y);
-	v.x *= length;
-	v.y *= length;
+	Normalize2P(&v);
 	return v;
 }
 
 vec3 Normalize3(vec3 v)
 {
-	register f32 length = FastInverseSqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-	v.x *= length;
-	v.y *= length;
-	v.z *= length;
+	Normalize3P(&v);
 	return v;
 }
 
 vec4 Normalize4(vec4 v)
 {
-	register f32 length = FastInverseSqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
-	v.x *= length;
-	v.y *= length;
-	v.z *= length;
-	v.w *= length;
+	Normalize4P(&v);
 	return v;
+}
+
+FORCE_INLINE vec3 Cross3P(vec3* a, vec3* b)
+{
+	vec3 r;
+	r.x = a->y * b->z - a->z * b->y;
+	r.y = a->z * b->x - a->x * b->z;
+	r.z = a->x * b->y - a->y * b->x;
+	return r;
 }
 
 FORCE_INLINE f32 Dot2P(vec2* a, vec2* b)
@@ -225,7 +224,7 @@ FORCE_INLINE vec3 Add3P(vec3* a, vec3* b)
 	return r;
 }
 
-FORCE_INLINE vec3 Sub3P(vec3* a, vec3* b)
+vec3 Sub3P(vec3* a, vec3* b)
 {
 	vec3 r;
 	r.x = a->x - b->x;
@@ -289,15 +288,6 @@ FORCE_INLINE vec4 Div4P(vec4* a, vec4* b)
 	r.y = a->y / b->y;
 	r.z = a->z / b->z;
 	r.w = a->w / b->w;
-	return r;
-}
-
-FORCE_INLINE vec3 Cross3P(vec3* a, vec3* b)
-{
-	vec3 r;
-	r.x = a->y * b->z - a->z * b->y;
-	r.y = a->z * b->x - a->x * b->z;
-	r.z = a->x * b->y - a->y * b->x;
 	return r;
 }
 
@@ -376,14 +366,14 @@ FORCE_INLINE vec4 Div4(vec4 a, vec4 b)
 	return Div4P(&a, &b);
 }
 
-FORCE_INLINE f32 Length3(vec3 v)
-{
-	return sqrtf32(v.x * v.x + v.y * v.y + v.z * v.z);
-}
-
 FORCE_INLINE f32 Length3P(vec3* v)
 {
 	return sqrtf32((v->x * v->x) + (v->y * v->y) + (v->z * v->z));
+}
+
+FORCE_INLINE f32 Length3(vec3 v)
+{
+	return Length3P(&v);
 }
 
 FORCE_INLINE vec2 Reflect2(vec2* v, vec2* n)
@@ -414,19 +404,6 @@ f32 GetDistanceVec2(vec2* a, vec2* b)
 	return sqrtf32(DX + DY);
 }
 
-f32 GetDistanceVec3(vec3 a, vec3 b)
-{
-	register f32 DX = a.x - b.x;
-	register f32 DY = a.y - b.y;
-	register f32 DZ = a.z - b.z;
-
-	DX *= DX;
-	DY *= DY;
-	DZ *= DZ;
-
-	return sqrtf32(DX + DY + DZ);
-}
-
 f32 GetDistanceVec3P(vec3* a, vec3* b)
 {
 	register f32 DX = a->x - b->x;
@@ -438,6 +415,11 @@ f32 GetDistanceVec3P(vec3* a, vec3* b)
 	DZ *= DZ;
 
 	return sqrtf32(DX + DY + DZ);
+}
+
+f32 GetDistanceVec3(vec3 a, vec3 b)
+{
+	return GetDistanceVec3P(&a, &b);
 }
 
 FORCE_INLINE vec2 Vec2(f32 x, f32 y)
@@ -476,8 +458,9 @@ FORCE_INLINE vec4 Vec4f(f32 x)
 	return r;
 }
 
+const f32 Radians = 0.01745329251f;
 //helper
-FORCE_INLINE f32 ToRadians(f32 Angle)
+FORCE_INLINE f32 ToRadians(f32 Ane)
 {
-	return Angle * 0.01745329251f;
+	return Ane * Radians;
 }

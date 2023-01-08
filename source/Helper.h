@@ -67,12 +67,18 @@ int LoadTexture(int Size, u8* Image)
 
 f32 DeltaTime = 0.0;
 f32 LastTime = 0.0;
+u32 DeltaTimeI = 0;
+u32 LastTimeI = 0;
 
 f32 GetDeltaTime()
 {
 	f32 CurrentTime = f32((s32)Ticks);
 	DeltaTime = CurrentTime - LastTime;
 	LastTime = CurrentTime;
+
+	u16 CurrentTimeI = Ticks;
+	DeltaTimeI = CurrentTimeI - LastTimeI;
+	LastTimeI = CurrentTimeI;
 
 	return DeltaTime;
 }

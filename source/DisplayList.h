@@ -58,6 +58,11 @@ void SetTexCoordToList(u32* List, u32 Index, vec2 TexCoord)
 	Index -= 2;
 
 	List[Index] = TEXTURE_PACK(f32tot16(TexCoord.x.Fixed), f32tot16(TexCoord.y.Fixed));
+//	List+=Index;
+
+//	u32 Src = TEXTURE_PACK(f32tot16(TexCoord.x.Fixed), f32tot16(TexCoord.y.Fixed));
+//	DC_FlushRange(&List[Index], sizeof(Src));
+//	dmaCopy(&Src, &List[Index], sizeof(Src));
 }
 
 vec3 GetVertexFromList(u32* List, u32 Index)

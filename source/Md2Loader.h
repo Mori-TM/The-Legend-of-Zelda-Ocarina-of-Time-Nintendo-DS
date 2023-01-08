@@ -243,7 +243,7 @@ namespace Md2
 		vec3* NormalList;
 
 	public:
-		void Start(s32 StartFrame, s32 EndFrame)
+		void Start(u32 StartFrame, u32 EndFrame)
 		{
 			if (StartFrame > Model->CurrentFrame)
 				Model->CurrentFrame = StartFrame;
@@ -272,13 +272,13 @@ namespace Md2
 			Model->Interpol += Percent;
 		}
 
-		void Update(s32 i)
+		void Update(u32 i)
 		{
 			register vec3* P0;
 			register vec3* P1;
 			register vec3 Inter = { Model->Interpol, Model->Interpol, Model->Interpol };
 			
-			for (u32 j = 0; j < 3; j++)
+			for (u8 j = 0; j < 3; j++)
 			{
 				P0 = &PointList[Model->TriIndex[i].MeshIndex[j]];
 				P1 = &NextPointList[Model->TriIndex[i].MeshIndex[j]];

@@ -1,3 +1,5 @@
+//For syntax highlighting
+#define ARM9
 #define FORCE_INLINE __attribute__((always_inline)) inline
 #define PI 3.14159265359f
 //#define NO_HARDWARE_ACCELERATION
@@ -19,15 +21,18 @@
 #include "DisplayList.h"
 #include "Renderer.h"
 #include "Audio.h"
-#include "Camera.h"
 #include "MiniMap.h"
 #include "Md2Loader.h"
+#include "Collision.h"
 
 #include "Models/KokiriForest.h"
 #include "Models/TempleOfTime.h"
+#include "Models/Sphere.h"
 //#include "Models/YoungLink.h"
 
 #include "LinkTex_pcx.h"
+
+#include "Camera.h"
 
 int YoungLinkTextures[1];
 void YoungLinkLoadTextures()
@@ -55,10 +60,6 @@ FORCE_INLINE void CreatePack(u32 Index, u32* List, u32* Off, u32* CmdOff, Md2::P
 
 void DrawMd2(u32* List, Md2::Proccess* Model)
 {
-	List[0] = ((Model->Model->NumTriangles * 3) - 2) * 5 + 11;
-	List[1] = FIFO_COMMAND_PACK(FIFO_BEGIN, FIFO_TEX_COORD, FIFO_NORMAL, FIFO_VERTEX16);
-	List[2] = GL_TRIANGLE;
-	
 	register u32 Off = 0;
 	register u32 CmdOff = 7;
 	register u32 i = 0;
@@ -71,7 +72,7 @@ void DrawMd2(u32* List, Md2::Proccess* Model)
 	CreatePack(2, List, &Off, &CmdOff, Model);
 	CreatePack(1, List, &Off, &CmdOff, Model);
 
-	for (i = 1; i < Model->Model->NumTriangles - 1; i++)
+	for (i = 1; i < Model->Model->NumTriangles; i++)
 	{
 		Model->Update(i);
 		
@@ -80,120 +81,38 @@ void DrawMd2(u32* List, Md2::Proccess* Model)
 		CreatePack(1, List, &Off, &CmdOff, Model);
 	}
 
-	Model->Update(i);
+//	Model->Update(i);
 	
-	CreatePack(0, List, &Off, &CmdOff, Model);
-	CreatePack(2, List, &Off, &CmdOff, Model);
-	CreatePack(1, List, &Off, &CmdOff, Model);
+//	CreatePack(0, List, &Off, &CmdOff, Model);
+//	CreatePack(2, List, &Off, &CmdOff, Model);
+//	CreatePack(1, List, &Off, &CmdOff, Model);
 }
+
+f32 AnimationSpeed = 3.74;
 
 FORCE_INLINE void Display()
 {	
-	f32 Z = 0.0;
-	f32 O = 1.0;
-	/*
-	m4x4 PlayerRot = 
-	{
-		O.Fixed, 0, 0, 0,
-		CameraDir.x.Fixed, CameraDir.y.Fixed, CameraDir.z.Fixed, 0,
-		0, O.Fixed, 0, 0,
-		0, 0, 0, O.Fixed
-	};
-	*/
-/*
-	m3x3 PlayerRot = 
-	{
-		CameraDir.x.Fixed, 0, CameraDir.z.Fixed,
-		0, 1, 0,
-		-CameraDir.z.Fixed, 0,  CameraDir.x.Fixed,
-	};
-	*/
-/*
-	m4x4 PlayerRot = 
-	{
-		O.Fixed, CameraDir.x.Fixed, 0, 0,
-		0, CameraDir.y.Fixed, O.Fixed, 0,
-		0, CameraDir.z.Fixed, 0, 0,
-		0, 0, 0, O.Fixed
-	};
-*/
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FORMAT_LIGHT0);
 	glEnable(GL_TEXTURE_2D);
-/*
-	vec3 Up = { 0.0, 1.0, 0.0 };
-	vec3 Left = Cross3P(&PlayerDir, &Up);
-	Normalize3P(&Left);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FORMAT_LIGHT0);
 
-	Up = Cross3P(&Left, &PlayerDir);
-	Normalize3P(&Up);
-
-	m4x4 Matrix =
-	{
-		Left.x.Fixed, Left.y.Fixed, Left.z.Fixed, 0,     //LEFT
-		Up.x.Fixed, Up.y.Fixed, Up.y.Fixed, 0,                       //UP 
-		PlayerDir.x.Fixed, PlayerDir.y.Fixed, PlayerDir.z.Fixed, 0,  //FORWARD
-		PlayerPos.x.Fixed, PlayerPos.y.Fixed, PlayerPos.z.Fixed, O.Fixed
-	};
-*/
-/*
-	m4x4 Matrix =
-	{
-		Left.x.Fixed, Up.x.Fixed, PlayerDir.x.Fixed, PlayerPos.x.Fixed,
-		Left.y.Fixed, Up.y.Fixed, PlayerDir.y.Fixed, PlayerPos.y.Fixed,
-		Left.z.Fixed, Up.y.Fixed, PlayerDir.z.Fixed, PlayerPos.z.Fixed,
-		0, 0, 0, O.Fixed
-	};
-*/
 	glPushMatrix();
 		glTranslateV(&PlayerPos);
-	//	glMultMatrix4x4(&Matrix);
-		glRotatefx(-90.0f, 1.0f, 0.0f, 0.0f);
-/*
-		vec2 Dir0 = { 0.0, 1.0 };
-		vec2 Dir = PlayerRot;
-	//	Normalize2P(&Dir);
-	//	f32 Angle = -acosf32(Dot2P(&Dir0, &Dir) / (sqrtf32(Dir.x * Dir.x + Dir.y * Dir.y) * sqrtf32(Dir0.x * Dir0.x + Dir0.y * Dir0.y)));
-	//	f32 Angle = -sinf32(Dir.y / (sqrtf32(Dir.x * Dir.x + Dir.y * Dir.y))) * 180.0 / PI;
-	//	f32 Angle = (atan2f32(Dir.x.Float(), Dir.y.Float()));
-		f32 x1 = 1.0;
-		f32 y1 = 0.0;
-		f32 x2 = PlayerRot.x;
-		f32 y2 = PlayerRot.y;
-		f32 dot = x1*x2 + y1*y2;
-		f32 det = x1*y2 - y1*x2;
-	//	f32 Angle = atan2f32(det.Float(), dot.Float());
-		f32 Angle = atan2f32((y1 - y2).Float(), (x1 - x2).Float());
-	//	f32 Angle = asinf32(Length3P())
-		glRotatefx(Angle, 0.0, 0.0, 1.0);
-		*/
-	//	vec3 Dir0 = PlayerPos;
-	//	Dir0.y = 0.0;
-	//	vec3 Dir1 = CameraDir;
-	//	Dir1.y = 0.0;
-	//	Dir0 = Add3P(&Dir0, &Dir1);
-	//	gluLookAtV(&PlayerPos, &Dir0, &CameraUp);
-	//	glRotatefx(-90.0f, 1.0f, 0.0f, 0.0f);
-	//	glScalefx(8.0, 8.0, 8.0);
-		
-	//	glRotatefx(PlayerRotY + 90.0f, 0.0f, 1.0f, 0.0f);
+		glRotatefx(FN90, F1, F0, F0);
 
 		Md2::Proccess ProcModel;
 		ProcModel.Model = &Model;
-		ProcModel.Start(0, Model.NumFrames);
+		ProcModel.Start(0, 20);
 	//	ProcModel.Start(0, Model.NumFrames);
 		DrawMd2(List, &ProcModel);
-		ProcModel.End((DeltaTime * 3.74).Float());
+		ProcModel.End((DeltaTime * AnimationSpeed));
 		glBindTexture(GL_TEXTURE_2D, YoungLinkTextures[0]);
 		glCallList((u32*)List);
-	//	glScalefx(0.75f, 0.75f, 0.75f);
-		
 	glPopMatrix(1);
 
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 );
 
 	glPushMatrix();
-		glTranslatefx(0.0f, -2.0f, 0.0f);
-		glScalefx(100.0f, 100.0f, 100.0f);
+		glScalefx(F100, F100, F100);
 
 		if (SceneToRender == 0)
 			TempleofTimeDraw();
@@ -228,9 +147,21 @@ void PollKeyEvents()
 		}		
 	}
 	if (KeysDown & KEY_B) UpdateTimer = !UpdateTimer;
+	if (KeysDown & KEY_X)
+	{
+		CameraPos = { 0.0, 3.0, 8.0 };
+		CameraDir = { 0.0, 0.0,-1.0 };
+		CameraUp = { 0.0, 1.0, 0.0 };
+		PlayerPos = { 5.0, 20.0, 0.0 };
+		PlayerDir = { 0.0, 0.0,-1.0 };
+		PlayerNor = { 0.0, 0.0,-1.0 };
+		PlayerCameraDist = 0.0;
+		PlayerFallSpeed = -0.1;
+		PlayerVelocity = 0.0;
+	}
 
-	if (KeysDown & KEY_X) LinkDrawCount++;
-	if (KeysDown & KEY_Y && LinkDrawCount > 0) LinkDrawCount--;
+	//if (KeysDown & KEY_X) LinkDrawCount++;
+	//if (KeysDown & KEY_Y && LinkDrawCount > 0) LinkDrawCount--;
 	if (KeysDown & KEY_SELECT) RenderMap = !RenderMap;
 
 	if (KeysHeld & KEY_START) exit(0);
@@ -260,50 +191,81 @@ int main()
 	*/
 	Md2::Load((u8*)Link_bin, (u32)Link_bin_size, 128, 128, &Model);
 	List = (u32*)malloc((((Model.NumTriangles * 3) - 2) * 5 + 12) * sizeof(u32));
+	List[0] = ((Model.NumTriangles * 3) - 2) * 5 + 11;
+	List[1] = FIFO_COMMAND_PACK(FIFO_BEGIN, FIFO_TEX_COORD, FIFO_NORMAL, FIFO_VERTEX16);
+	List[2] = GL_TRIANGLE;
 
 	timerStart(0, ClockDivider_1024, 0, NULL);
 
 	f32 Time = 0.0f;
-	while(1) 
-	{	
-		PollKeyEvents();
-		
+	while (1) 
+	{		
+		PollKeyEvents();		
+
 		if (UpdateTimer)
-			Time += DeltaTime * 0.003f;
+			Time += DeltaTime * LightDelay;
 
 	//	if (Time >= DEGREES_IN_CIRCLEF32)
 	//		Time = 0.0f;
 
 		glLoadIdentity();
 
-		LightPos = { -sinf32(Time) * 8.0f, -8.0f, -cosf32(Time) * 8.0f };	
+		LightPos = { -sinf32(Time) * F8, FN8, -cosf32(Time) * F8 };	
 		Normalize3P(&LightPos);
 
 	//	glLight(0, RGB15(floattov10(LightColor.x.Float()), floattov10(LightColor.y.Float()), floattov10(LightColor.z.Float())), floattov10(LightPos.x.Float()), floattov10(LightPos.y.Float()), floattov10(LightPos.z.Float()));
 	//	LightPos =
 		RendererSetLight(0, LightColor, LightPos);
-
+		
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspectivefx(-70.0f, 1.333333333333333f, 0.1f, 1000.0f);
+		gluPerspectivefx(FOV, Aspect, NearZ, FarZ);
 	//	UpdateCamera();
 	//	UpdateLink();
 		UpdateCamera();
-		glMatrixMode(GL_MODELVIEW);		
-		Display();
+		glMatrixMode(GL_MODELVIEW);	
 		
+
+			/*	
+		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
+		glPushMatrix();
+		glTranslateV(&Pos);
+		glScalefx(1.0, 1.0, 1.0);
+		if (Collision == -1)//no collision
+			glBindTexture(0, 0);
+		else if (Normal.y < 0.1)
+		{
+			glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[Collision]);
+			f32 V = Radius - Dist;
+			vec3 O = { Normal.x * V, Normal.y * V, Normal.z * V };
+			PlayerPos = Add3P(&PlayerPos, &O);
+		//	PlayerPos = Add3P(&PlayerPos, &P);
+		}
+			
+		glCallList((u32*)Sphere);
+		glPopMatrix(1);
+*/
+		Display();
+
 		if (RenderMap)
 			MiniMapRender();
 		
-		RendererDebugInfos();
-		printf("\x1b[13;2H Player Rot: %.1f %.1f", PlayerRot.x.Float(), PlayerRot.y.Float());
-		printf("\x1b[14;2H Camera Dir: %.1f %.1f %.1f", CameraDir.x.Float(), CameraDir.y.Float(), CameraDir.z.Float());
+	//	RendererDebugInfos();
+	//	printf("\x1b[13;2H Player Col: %.1f %.1f %.1f", Normal.x.Float(), Normal.y.Float(), Normal.z.Float());
+	//	printf("\x1b[13;2H Player Rot: %.1f %.1f", PlayerRot.x.Float(), PlayerRot.y.Float());
+	//	printf("\x1b[14;2H Camera Dir: %.1f %.1f %.1f", CameraDir.x.Float(), CameraDir.y.Float(), CameraDir.z.Float());
 		glFlush(0);		
+	//	swiWaitForVBlank();
+	//	consoleClear();		
+
 		Ticks += timerElapsed(0);
 		if (Ticks >= INT32_MAX)
 			Ticks = 0;
 		Ticksf32 = (float)Ticks;
 		GetDeltaTime();
+		Frame = (Frame + 1) % MaxFrames;
+	//	printf("\x1b[19;2H Ticks: %d", Ticks);
+	//	printf("\x1b[19;2H Dt int: %u", DeltaTimeI);
 	}
 
 	TempleofTimeDeleteTextures();

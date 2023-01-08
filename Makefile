@@ -38,9 +38,9 @@ NITRO    :=
 #---------------------------------------------------------------------------------
 ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
         #-S -fverbose-asm -Wall -O3
-CFLAGS   := -g -Wall -O3 -w\
-            -fomit-frame-pointer\
-            -ffast-math\
+CFLAGS   := -g -Wall -O3 -w -fno-unroll-loops\
+            -fomit-frame-pointer -finline-functions-called-once\
+            -ffast-math -fno-peel-loops\
             $(ARCH) $(INCLUDE) -DARM9
 CXXFLAGS := $(CFLAGS)-fno-rtti -fno-exceptions
 ASFLAGS  := -g $(ARCH)
