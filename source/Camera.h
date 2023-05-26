@@ -1,16 +1,21 @@
-const vec3 CameraPosOff = { 0.0, 3.0, 5.0 };
-vec3 CameraPos = { 0.0, 3.0, 8.0 };
-vec3 CameraDir = { 0.0, 0.0,-1.0 };
-vec3 CameraUp = { 0.0, 1.0, 0.0 };
-vec3 PlayerPos = { 5.0, 0.0, 0.0 };
-vec3 PlayerDir = { 0.0, 0.0,-1.0 };
-vec3 PlayerNor = { 0.0, 0.0,-1.0 };
-f32 PlayerCameraDist = 0.0;
+const vec3 CameraPosOff = { 0, F3, F5 };
+vec3 CameraPos = { 0, 1144, F8 };
+vec3 CameraDir = { 0, 0,-F1 };
+vec3 CameraUp = { 0, F1, 0 };
 
-f32 PlayerFallSpeed = -0.25;
-f32 PlayerVelocity = 0.0;
+vec3 PlayerPos = { F5, F0, 0 };
+vec3 PlayerDir = { 0, 0,-F1 };
+vec3 PlayerNor = { 0, 0,-F1 };
+f32 PlayerCameraDist = 0;
+
+f32 PlayerFallSpeed = -900;
+f32 PlayerVelocity = 0;
 
 bool ChangedPlayerDir = false;
+bool PlayerOnGround = false;
+f32 PlayerHitboxSize = 6144;//1.5
+f32 CameraMinDist = 13757;
+f32 CameraMaxDist = 21949;
 
 typedef enum
 {
@@ -23,27 +28,29 @@ short KeyState = 0;
 
 void UpdatePlayer()
 {
-	f32 Speed = DeltaTime * 1.5;
-	CameraDir = Mul3(CameraDir, Vec3f(Speed));
+	f32 Speed = Mul(DeltaTime, 5144);//1,5
+	vec3 r;
+	Mul3(CameraDir, Vec3f(Speed, r), CameraDir);
 
-	f32 PrevPlayerY = PlayerPos.y;
-	f32 PrevCameraY = CameraPos.y;
+	f32 PrevPlayerY = PlayerPos[1];
+	f32 PrevCameraY = CameraPos[1];
 
 
 	if (KeysHeld & KEY_RIGHT)
 	{
-		PlayerDir.x = CameraDir.x;
-		PlayerDir.y = 0.0;
-		PlayerDir.z = CameraDir.z;
-		Normalize3P(&PlayerDir);
+		PlayerDir[0] = CameraDir[0];
+		PlayerDir[1] = 0;
+		PlayerDir[2] = CameraDir[2];
+		Normalize3(PlayerDir);
 
-	//	PlayerNor.x = -PlayerDir.x;
-	//	PlayerNor.y = -PlayerDir.y;
-	//	PlayerNor.z = -PlayerDir.z;
+	//	PlayerNor[0] = -PlayerDir[0];
+	//	PlayerNor[1] = -PlayerDir[1];
+	//	PlayerNor[2] = -PlayerDir[2];
 
-		PlayerDir = Mul3(PlayerDir, Vec3f(Speed));
-		PlayerDir = Cross3P(&CameraUp, &PlayerDir);
-		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+		Mul3(PlayerDir, Vec3f(Speed, r), PlayerDir);
+		Cross3(CameraUp, PlayerDir, r);
+		Copy3(r, PlayerDir);
+		Add3(PlayerPos, PlayerDir, PlayerPos);
 
 		ChangedPlayerDir = true;
 		KeyState |= KEY_STATE_RIGHT;
@@ -52,20 +59,17 @@ void UpdatePlayer()
 		KeyState &= ~KEY_STATE_RIGHT;
 	if (KeysHeld & KEY_LEFT)
 	{
-		PlayerDir.x = -CameraDir.x;
-		PlayerDir.y = 0.0;
-		PlayerDir.z = -CameraDir.z;
-		Normalize3P(&PlayerDir);
+		PlayerDir[0] = -CameraDir[0];
+		PlayerDir[1] = 0;
+		PlayerDir[2] = -CameraDir[2];
+		Normalize3(PlayerDir);
 
 		
 
-		PlayerDir = Mul3(PlayerDir, Vec3f(Speed));
-		PlayerDir = Cross3P(&CameraUp, &PlayerDir);
-	//	PlayerDir.x = -PlayerDir.x;
-	//	PlayerDir.y = -PlayerDir.y;
-	//	PlayerDir.z = -PlayerDir.z;
-
-		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+		Mul3(PlayerDir, Vec3f(Speed, r), PlayerDir);
+		Cross3(CameraUp, PlayerDir, r);
+		Copy3(r, PlayerDir);
+		Add3(PlayerPos, PlayerDir, PlayerPos);
 
 		ChangedPlayerDir = true;
 		KeyState |= KEY_STATE_LEFT;
@@ -74,15 +78,13 @@ void UpdatePlayer()
 		KeyState &= ~KEY_STATE_LEFT;
 	if (KeysHeld & KEY_DOWN)
 	{
-		PlayerDir.x = CameraDir.x;
-		PlayerDir.y = 0.0;
-		PlayerDir.z = CameraDir.z;
-		Normalize3P(&PlayerDir);
+		PlayerDir[0] = CameraDir[0];
+		PlayerDir[1] = 0;
+		PlayerDir[2] = CameraDir[2];
+		Normalize3(PlayerDir);
 
-		PlayerDir = Mul3(PlayerDir, Vec3f(Speed));
-	//	PlayerDir = CameraDir;
-		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
-
+		Mul3(PlayerDir, Vec3f(Speed, r), PlayerDir);
+		Add3(PlayerPos, PlayerDir, PlayerPos);
 		
 
 		ChangedPlayerDir = true;
@@ -92,15 +94,15 @@ void UpdatePlayer()
 		KeyState &= ~KEY_STATE_DOWN;
 	if (KeysHeld & KEY_UP)
 	{
-	//	PlayerDir.x = -CameraDir.x;
-	//	PlayerDir.y = -CameraDir.y;
-	//	PlayerDir.z = -CameraDir.z;
-		PlayerDir.x = -CameraDir.x;
-		PlayerDir.y = 0.0;
-		PlayerDir.z = -CameraDir.z;
-		Normalize3P(&PlayerDir);
-		PlayerDir = Mul3(PlayerDir, Vec3f(Speed));
-		PlayerPos = Add3P(&PlayerPos, &PlayerDir);
+	//	PlayerDir[0] = -CameraDir[0];
+	//	PlayerDir[1] = -CameraDir[1];
+	//	PlayerDir[2] = -CameraDir[2];
+		PlayerDir[0] = -CameraDir[0];
+		PlayerDir[1] = 0;
+		PlayerDir[2] = -CameraDir[2];
+		Normalize3(PlayerDir);
+		Mul3(PlayerDir, Vec3f(Speed, r), PlayerDir);
+		Add3(PlayerPos, PlayerDir, PlayerPos);
 
 		
 
@@ -119,17 +121,17 @@ void UpdatePlayer()
 //	{
 //		vec3 Dir = Div3(PlayerDir, Vec3f(Speed));
 //
-//		f32 AbsX = fabsf(Dir.x);
-//		f32 AbsZ = fabsf(Dir.z);
+//		f32 AbsX = fabsf(Dir[0]);
+//		f32 AbsZ = fabsf(Dir[2]);
 //
 //		mat4 M = RotateYMat4(LoadMat4Identity(), ToRadians(PlayerRotY));
 //		M = TranslateMat4(M, PlayerPos);
-//		vec4 Pos = { CameraPos.x, CameraPos.y, CameraPos.z, 1.0 };
+//		vec4 Pos = { CameraPos[0], CameraPos[1], CameraPos[2], 1.0 };
 //
 //		Pos = MultiplyVec4Mat4P(&Pos, &M);
-//		CameraPos.x = Pos.x;
-//		CameraPos.y = Pos.y;
-//		CameraPos.z = Pos.z;
+//		CameraPos[0] = Pos[0];
+//		CameraPos[1] = Pos[1];
+//		CameraPos[2] = Pos[2];
 //
 //		ChangedPlayerDir = false;
 //		//	CameraPos = Mul3P(&CameraPos, &Dir);
@@ -138,75 +140,125 @@ void UpdatePlayer()
 //	vec3 Dir = Div3(PlayerDir, Vec3f(Speed));
 //	PrintVec3(&CameraPos);
 
-	PlayerPos.y = PrevPlayerY;
+	PlayerPos[1] = PrevPlayerY;
 }
+/*
+#define SHIFT_AMOUNT 12 // 2^16 = 65536
+#define SHIFT_MASK ((1 << SHIFT_AMOUNT) - 1) 
 
 void PlayerWallCollision()
 {
-	vec3 Pos = PlayerPos;
-	Pos.y += 1.0;
-	vec3 Normal = {0.0, 0.0, 0.0};
-	f32 Radius = 2.5f;
-	f32 Dist = F0;
-	PlayerNor = PlayerDir;
-//	PlayerNor.y = F0;
-	Normalize3P(&PlayerNor);
-	int Collision = KokiriForestWallCollision(&Pos, Radius, &PlayerNor, 100.0f, &Normal, &Dist);
-//	printf("\x1b[17;2H Collis Nor: %d %d %d", Normal.x.Fixed, Normal.y.Fixed, Normal.z.Fixed);
 
+	vec3 Pos; Copy3(PlayerPos, Pos);
+	Pos[1] += F1;
+	vec3 Normal = { 0, 0, 0 };
+	f32 Radius = PlayerHitboxSize;
+	f32 Dist = F0;
+	Copy3(PlayerDir, PlayerNor);
+//	PlayerNor[1] = F0;
+	Normalize3(PlayerNor);
+	int Collision = ProccessCollision((u8*)KokiriForestCollision_bin, Pos, Radius, PlayerNor, F100, Normal, &Dist);
+//	int Collision = KokiriForestWallCollision(Pos, Radius, PlayerNor, F100, Normal, &Dist);
+//	printf("\x1b[14;2H Collis Nor: %f", Test);
 	if (Collision == -1)//no collision
 	{
 		
 	}
 	else
 	{
+	//	Normalize3(Normal);
+		printf("\x1b[14;2H Collis Nor: %d.%d %d.%d %d.%d", Normal[0] >> SHIFT_AMOUNT, Normal[0] & SHIFT_MASK, Normal[1] >> SHIFT_AMOUNT, Normal[1] & SHIFT_MASK, Normal[2] >> SHIFT_AMOUNT, Normal[2] & SHIFT_MASK);
+		printf("\x1b[20;2H Collision Index: %d", Collision);
 		
 		f32 V = Radius - Dist;
-	//	printf("\x1b[13;2H Player Dist: %d, %d", Dist.Fixed, V.Fixed);
-		vec3 O = { Normal.x * V, Normal.y * V, Normal.z * V };
-		PlayerPos = Add3P(&PlayerPos, &O);
-	//	PlayerPos.y += 1.0;
+		printf("\x1b[21;2H V: %d", V);
+	//	printf("\x1b[13;2H Player Dist: %d, %d", Dist, V);
+		vec3 O = { Mul(Normal[0], V), Mul(Normal[1], V), Mul(Normal[2], V) };
+		Add3(PlayerPos, O, PlayerPos);
+	//	PlayerPos[1] += 1.0;
 	}
 }
+*/
+
+#define SHIFT_AMOUNT 12 // 2^16 = 65536
+#define SHIFT_MASK ((1 << SHIFT_AMOUNT) - 1) 
 
 void PlayerGroundCollision()
 {	
-	vec3 Pos = PlayerPos;
-	Pos.y += 1.0;
-	vec3 Normal = {0.0, 0.0, 0.0};
-	f32 Radius = 1.5f;
-	f32 Dist = F0;
-	vec3 Dir = { 0.0, -1.0, 0.0 };
-	int Collision = KokiriForestGroundCollision(&Pos, Radius, &Dir, 100.0f, &Normal, &Dist);	
+	PlayerPos[1] += PlayerVelocity;
+	PlayerVelocity += Mul(PlayerFallSpeed, DeltaTime);
+	
+	vec3 Pos; Copy3(PlayerPos, Pos);
+	Pos[1] += F1;//2548;
+
+	vec3 Normal = { 0, 0, 0};
+	vec3 Dir = { 0, -F1, 0 };
+	f32 Dist = F100;
+	
+	s8 Collision = ProccessCollision((u8*)KokiriForestCollision_bin, Pos, Dir, F200, Normal, &Dist);
+//	if (Normal[1] <= 1229)
+//		return;
+//	int Collision = KokiriForestGroundCollision(Pos, Radius, Dir, F100, Normal, &Dist);
 //	if (Collision != -1)
 //	{
 //	//	f32 V = Radius - Dist;
-//	//	vec3 O = { Normal.x * V, Normal.y * V, Normal.z * V };
+//	//	vec3 O = { Normal[0] * V, Normal[1] * V, Normal[2] * V };
 //	//	PlayerPos = Add3P(&PlayerPos, &O);
-//		PlayerPos.y = Dist - F1;
+//		PlayerPos[1] = Dist - F1;
 //	}
+	
+	
+	
+//	if (Dist >= 7144)//no collision
+//	{
+//		
+//	}
+//	if (Dist <= 7000 && PlayerVelocity < 0)
 
-	if (Collision == -1)//no collision
+	if (Collision == COLLISION_TYPE_NO_AABB)
+	{}
+	else if (Collision == COLLISION_TYPE_NO_COLLISION_BUT_AABB)
+	{}
+	else
 	{
-		PlayerPos.y += PlayerVelocity;
-		PlayerVelocity += PlayerFallSpeed * DeltaTime;
+		printf("\x1b[14;2H Collis Nor: %d.%d %d.%d %d.%d", Normal[0] >> SHIFT_AMOUNT, Normal[0] & SHIFT_MASK, Normal[1] >> SHIFT_AMOUNT, Normal[1] & SHIFT_MASK, Normal[2] >> SHIFT_AMOUNT, Normal[2] & SHIFT_MASK);
+		printf("\x1b[20;2H Collision Index: %d", Collision);
+		
+		if (Dist < PlayerHitboxSize)
+		{
+			PlayerVelocity = F0;
+			PlayerOnGround = true;
+			PlayerPos[1] -= Dist - F1;
+		}			
+		else
+			PlayerOnGround = false;
+	//	
+	}
+/*
+	if (Collision != -1)//Ther is a collision
+	{
+		printf("\x1b[14;2H Collis Nor: %d.%d %d.%d %d.%d", Normal[0] >> SHIFT_AMOUNT, Normal[0] & SHIFT_MASK, Normal[1] >> SHIFT_AMOUNT, Normal[1] & SHIFT_MASK, Normal[2] >> SHIFT_AMOUNT, Normal[2] & SHIFT_MASK);
+		printf("\x1b[20;2H Collision Index: %d", Collision);
+	//	printf("\x1b[13;2H Player Dist: %d, %d", Dist, V);
+	//	if (Normal[1] < 0.9)
+	//	{
+	//		f32 V = Radius - Dist;
+	//		vec3 O = { Normal[0] * V, Normal[1] * V, Normal[2] * V };
+	//		PlayerPos = Add3P(&PlayerPos, &O);
+	//	}		
+		PlayerPos[1] -= Dist - PlayerHitboxSize;
+	//	PlayerPos[1] = Dist - 4096;
+		PlayerOnGround = true;
+		PlayerVelocity = F0;
 	}
 	else
 	{
-		printf("\x1b[17;2H Collis Nor: %d %d %d", Normal.x.Fixed, Normal.y.Fixed, Normal.z.Fixed);
-		
-	//	printf("\x1b[13;2H Player Dist: %d, %d", Dist.Fixed, V.Fixed);
-	//	if (Normal.y < 0.9)
-	//	{
-	//		f32 V = Radius - Dist;
-	//		vec3 O = { Normal.x * V, Normal.y * V, Normal.z * V };
-	//		PlayerPos = Add3P(&PlayerPos, &O);
-	//	}		
-
-		PlayerVelocity = F0;
+		PlayerOnGround = false;
 	}
 
-	
+	if (Collision == -1)
+		PlayerVelocity = F0;
+		*/
 }
 
 //stylus = mouse
@@ -214,8 +266,8 @@ void PlayerGroundCollision()
 //L-Shoulder = Q
 void UpdateCamera()
 {
-	CameraDir = Sub3(CameraPos, PlayerPos);
-	Normalize3P(&CameraDir);
+	Sub3(CameraPos, PlayerPos, CameraDir);
+	Normalize3(CameraDir);
 	
 
 //	if (Frame == 0)
@@ -227,58 +279,41 @@ void UpdateCamera()
 //	else if (Frame == 1)
 	
 	
-	PlayerWallCollision();
+//	PlayerWallCollision();
 	PlayerGroundCollision();
 	
-	CameraPos.y = PlayerPos.y + 3.5;
+	CameraPos[1] = PlayerPos[1] + ToF32(2.4);
 
 	if (KeyState & KEY_STATE_UP)
 	{
-		PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
+		PlayerCameraDist = GetDistanceVec3(CameraPos, PlayerPos);
 
-		if (PlayerCameraDist > 7.8)
+		if (PlayerCameraDist > CameraMaxDist)
 		{
-			CameraPos = Add3P(&CameraPos, &PlayerDir);
+			Add3(CameraPos, PlayerDir, CameraPos);
 		//	PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
 		}
 			
 	}
 	else if (KeyState & KEY_STATE_DOWN)
 	{
-		PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
+		PlayerCameraDist = GetDistanceVec3(CameraPos, PlayerPos);
 		
-		if (PlayerCameraDist < 5.8)
+		if (PlayerCameraDist < CameraMinDist)
 		{
-			CameraPos = Add3P(&CameraPos, &PlayerDir);
+			Add3(CameraPos, PlayerDir, CameraPos);
 		//	PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
 		}
 	}
 
 	
-	PlayerPos.y += 1.0;
-	gluLookAtV(&CameraPos, &PlayerPos, &CameraUp);
-	PlayerPos.y -= 1.0;
-
+	
+	printf("\x1b[12;0H Last Ply Pos: %d %d %d", PlayerPosLast[0], PlayerPosLast[1], PlayerPosLast[2]);
+	printf("\x1b[13;0H Ply Pos: %d %d %d", PlayerPos[0], PlayerPos[1], PlayerPos[2]);
+	
 	//	CameraPos = Add3P(&CameraPosOff, &PlayerPos);
 	//This is for animating water
 
-	vec2 Time = { DeltaTime * 0.05f, DeltaTime * 0.05f };
-
-	for (int j = 0; j <  KokiriForestVertexCounts[33]; j += 3)
-	{
-		vec2 TexA = GetTexCoordFromList((u32*)waterModel, j);
-		vec2 TexB = GetTexCoordFromList((u32*)waterModel, j + 1);
-		vec2 TexC = GetTexCoordFromList((u32*)waterModel, j + 2);
-	//	f32 Multi = 0.0019531f;
-	//	vec2 Time = { DeltaTime * Multi, DeltaTime * Multi };
-		
-		TexA = Sub2P(&TexA, &Time);
-		TexB = Sub2P(&TexB, &Time);
-		TexC = Sub2P(&TexC, &Time);
-		SetTexCoordToList((u32*)waterModel, j	   , TexA);
-		SetTexCoordToList((u32*)waterModel, j + 1, TexB);
-		SetTexCoordToList((u32*)waterModel, j + 2, TexC);
-	//	if (SphereRayVsTriangle(Pos, Radius, RayDir, TriScale, &A, &B, &C, Normal, Dist)) return 34;
-	}
 	
+
 }

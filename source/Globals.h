@@ -1,33 +1,33 @@
-u16 SceneToRender = 1;
 bool UpdateTimer = true;
 
-vec3 LightPos = { 0.0f, 0.0f, 1.0f };
-vec3 LightColor = { 1.0f, 0.449f, 0.001f };
+vec3 LightPos = { 0, 0, 0 };
+vec3 LightColor = { 4096, 1839, 4 };
 
-u16 LinkDrawCount = 0;
 bool RenderMap = false;
 
 u32 Ticks = 0;
-f32 Ticksf32 = 0.0;
+f32 Ticksf32 = 0;
 
-u16 Frame = 0;
-const u16 MaxFrames = 2;
+//#define FOV				-286720	//70.0
+#define FOV				204800	//50.0
+#define ASPECT_RATIO	5461	//1.3333333
+#define NEAR_Z			410		//0.1
+#define FAR_Z			4096000	//1000.0
+#define LIGHT_DELAY		12
 
-const f32 FOV = -70.0f;
-const f32 Aspect = 1.333333333333333f;
-const f32 NearZ = 0.1f;
-const f32 FarZ = 1000.0f;
-
-const f32 LightDelay = 0.003f;
-
-const f32 F0 = 0.0f;
-const f32 F1 = 1.0f;
-const f32 F2 = 2.0f;
-const f32 F8 = 8.0f;
-const f32 F90 = 90.0f;
-const f32 F100 = 100.0f;
-
-const f32 FN0 = -0.0f;
-const f32 FN1 = -1.0f;
-const f32 FN8 = -8.0f;
-const f32 FN90 = -90.0f;
+#define F0		0
+#define F1		4096
+#define F2		8192
+#define F3		12288
+#define F4		16384
+#define F5		20480
+#define F6		24576
+#define F8		32768
+#define F9		36864
+#define F10		40960
+#define F20		81920
+#define F31		126976
+#define F50		204800
+#define F90		368640
+#define F100	409600
+#define F200	819200

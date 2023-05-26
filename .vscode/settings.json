@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "nds.h": "c",
+        "linkedlist.h": "c",
+        "background.h": "c",
+        "video.h": "c",
+        "sphere.h": "c",
+        "postest.h": "c",
+        "math3d.h": "c",
+        "globals.h": "c",
+        "helper.h": "c",
+        "camera.h": "c",
+        "fixed.h": "c",
+        "renderer.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

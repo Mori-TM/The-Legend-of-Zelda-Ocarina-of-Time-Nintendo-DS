@@ -1,5 +1,5 @@
 FORCE_INLINE void RendererInit()
-{	
+{
 	videoSetMode(MODE_0_3D);
 	glInit();
 
@@ -23,9 +23,9 @@ FORCE_INLINE void RendererInit()
 	glClearDepth(0x7FFF);
 
 	glViewport(0, 0, 255, 191);
-	glLight(0, RGB15(31, 0, 0), 0, floattov10(-1.0f), 0);
-	glLight(1, RGB15(0, 31, 0), floattov10(1.0f), 0, 0);
-	glLight(2, RGB15(0, 0, 31), floattov10(-1.0f), 0, 0);
+//	glLight(0, RGB15(31, 0, 0), 0, floattov10(-1.0f), 0);
+//	glLight(1, RGB15(0, 31, 0), floattov10(1.0f), 0, 0);
+//	glLight(2, RGB15(0, 0, 31), floattov10(-1.0f), 0, 0);
 
 	glMaterialf(GL_AMBIENT, RGB15(1, 1, 1));
 	glMaterialf(GL_DIFFUSE, RGB15(31, 31, 31));
@@ -46,10 +46,10 @@ FORCE_INLINE void RendererDebugInfos()
 
 	printf("\x1b[1;2H Vertices in Ram: %i/6144", VertexCount);
 	printf("\x1b[2;2H Triangles in Ram: %i/2048", PolyCount);
-	printf("\x1b[3;2H Light Dir: %.1f %.1f %.1f", LightPos.x.Float(), LightPos.y.Float(), LightPos.z.Float());
-	printf("\x1b[4;1H Light Color: %.2f %.2f %.2f", LightColor.x.Float(), LightColor.y.Float(), LightColor.z.Float());
+//	printf("\x1b[3;2H Light Dir: %.1f %.1f %.1f", LightPos[0].Float(), LightPos[1].Float(), LightPos[2].Float());
+//	printf("\x1b[4;1H Light Color: %.2f %.2f %.2f", LightColor[0].Float(), LightColor[1].Float(), LightColor[2].Float());
 //	printf("\x1b[5;3H Battery: %ld%%", getBatteryLevel());
-	
+	/*
 	switch (SceneToRender)
 	{
 	case 0:
@@ -60,18 +60,60 @@ FORCE_INLINE void RendererDebugInfos()
 		printf("\x1b[6;3H Scene: Kokiri Forest");
 		break;
 	}
-
+	*/
 	printf("\x1b[8;1H A = chnage scene");
 	printf("\x1b[9;1H B = rotate light");
 	printf("\x1b[10;1H X/Y = add/sub Links");
 	printf("\x1b[11;1H select = map");
 
-	printf("\x1b[12;1H Delta Time: %f", DeltaTime.Float());
+//	printf("\x1b[12;1H Delta Time: %f", DeltaTime.Float());
 }
 
 FORCE_INLINE void RendererSetLight(int Light, vec3 Color, vec3 Dir)
 {
 	glLight(Light, 
-			RGB15((int)(LightColor.x * 31.0f).Float(), (int)(LightColor.y * 31.0f).Float(), (int)(LightColor.z * 31.0f).Float()),
-			f32tov10(LightPos.x.Fixed), f32tov10(LightPos.y.Fixed), f32tov10(LightPos.z.Fixed));
+			RGB15((int)ToFloat(Mul(Color[0], F31)), (int)ToFloat(Mul(Color[1], F31)), (int)ToFloat(Mul(Color[2], F31))),//To Float conversation too expesive
+			f32tov10(Dir[0]), f32tov10(Dir[1]), f32tov10(Dir[2]));
+}
+
+void RendererSetPointLight(int Light, vec3 Color, vec3 LightPos, vec3 DstPos, f32 MaxDist)
+{
+	f32 Dist = GetDistanceVec3(LightPos, DstPos);
+    
+    u32 Brightness = 126976;
+	
+    if (Dist >= MaxDist)
+    {
+    	glLight(Light, 
+				RGB15(0, 0, 0),
+				f32tov10(LightPos[0]), f32tov10(LightPos[1]), f32tov10(LightPos[2]));
+        return;
+    }
+    else
+    {
+        f32 x = Div(Dist, MaxDist);
+        x = 126976 - Mul(x, 126976);//255
+        Brightness= x;
+    }
+	
+//	vec3 PosT;// Copy3(DstPos, PosT);
+	
+	vec3 Dir; Sub3(DstPos, LightPos, Dir);
+	Normalize3(Dir);
+
+//	Dir[0] = -Dir[0];
+//	Dir[1] = -Dir[1];
+//	Dir[2] = -Dir[2];
+	
+	f32 x = Mul(Color[0], Brightness);
+	f32 y = Mul(Color[1], Brightness);
+	f32 z = Mul(Color[2], Brightness);
+	
+//	Light = (Light & 3) << 14;
+//	GFX_LIGHT_VECTOR = Light | ((f32tov10(Dir[2]) & 0x3FF) << 20) | ((f32tov10(Dir[1]) & 0x3FF) << 10) | (f32tov10(Dir[0]) & 0x3FF);
+//	GFX_LIGHT_COLOR = Light | RGB15((int)ToFloat(x), (int)ToFloat(y), (int)ToFloat(z));
+
+	glLight(Light, 
+			RGB15((int)ToFloat(x), (int)ToFloat(y), (int)ToFloat(z)),//To Float conversation too expesive (int)ToFloat(x), (int)ToFloat(y), (int)ToFloat(z)
+			f32tov10(Dir[0]), f32tov10(Dir[1]), f32tov10(Dir[2]));
 }

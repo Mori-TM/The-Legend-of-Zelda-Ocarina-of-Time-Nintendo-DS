@@ -65,14 +65,14 @@ int LoadTexture(int Size, u8* Image)
 }
 
 
-f32 DeltaTime = 0.0;
-f32 LastTime = 0.0;
+f32 DeltaTime = 0;
+f32 LastTime = 0;
 u32 DeltaTimeI = 0;
 u32 LastTimeI = 0;
 
 f32 GetDeltaTime()
 {
-	f32 CurrentTime = f32((s32)Ticks);
+	f32 CurrentTime = Ticks;
 	DeltaTime = CurrentTime - LastTime;
 	LastTime = CurrentTime;
 
@@ -81,4 +81,39 @@ f32 GetDeltaTime()
 	LastTimeI = CurrentTimeI;
 
 	return DeltaTime;
+}
+
+//Fps
+typedef struct
+{
+	int Frame;
+	int FinalTime;
+	int InitTime;
+	int FinalFps;
+} FrameMeasureData;
+/*
+int Frame = 0;
+int FinalTime;
+int InitTime = 0;
+int FinalFps = 0;
+*/
+
+FrameMeasureData RenderFrame = { 0, 0, 0, 0 };
+FrameMeasureData CollisionFrame = { 0, 0, 0, 0 };
+FrameMeasureData GlobalFrame = { 0, 0, 0, 0 };
+
+#define TIMER_SPEED (BUS_CLOCK/1024)
+
+int MeasureFps(FrameMeasureData* Data)
+{
+	Data->Frame++;
+	Data->FinalTime = Ticks / TIMER_SPEED;
+	if (Data->FinalTime - Data->InitTime > 0)
+	{
+		Data->FinalFps = Data->Frame / (Data->FinalTime - Data->InitTime);
+		Data->Frame = 0;
+		Data->InitTime = Data->FinalTime;
+	}
+	
+	return Data->FinalFps;
 }
