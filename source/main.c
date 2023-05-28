@@ -30,6 +30,20 @@ vec3 PlayerPosLast = { F5, F0, 0 };
 #include "Md2Loader.h"
 #include "Collision.h"
 
+/*
+To-Do
+-subdived ramp at deku tree
+-split forest mesh more?
+-implement wall collision
+-clean up collision mesh
+-remove overlapping triangles in render mesh
+-fix wierd alpha texture issue on ds hardware
+
+Infos for me
+-If ramp triangle collision doesn't work 100% just subdived it
+-collision model needs to be half the size of the render model, 
+ because collision only uses 16 bit fixed for data storing
+*/
 
 //#include "Models/YoungLink.h"
 
@@ -114,7 +128,7 @@ FORCE_INLINE void Display()
 	glPopMatrix(1);
 
 */
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT1);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT2);
 
 	
 
@@ -320,6 +334,7 @@ int main()
 			Normalize3(LightPos);
 
 			RendererSetLight(0, LightColor, LightPos);
+			RendererSetLight(2, LightColor, CameraDir);
 
 			
 			Vec3(-50899, 945, -46252, SrcPos);
@@ -328,11 +343,13 @@ int main()
 
 			Display();
 
-			vec2 Time; Vec2f(Mul(DeltaTime, 10), Time);
+			vec2 Time = { 1, 1 };
+			//Vec2f(Mul(DeltaTime, 10), Time);
 
+			//animate water
 			for (int j = 0; j < 75; j += 3)
 			{
-				vec2 TexA; GetTexCoordFromList((u32*)KokiriForestwater_bin, j	  , TexA);
+				vec2 TexA; GetTexCoordFromList((u32*)KokiriForestwater_bin, j	 , TexA);
 				vec2 TexB; GetTexCoordFromList((u32*)KokiriForestwater_bin, j + 1, TexB);
 				vec2 TexC; GetTexCoordFromList((u32*)KokiriForestwater_bin, j + 2, TexC);
 			//	f32 Multi = 0019531f;
@@ -341,7 +358,14 @@ int main()
 				Sub2(TexA, Time, TexA);
 				Sub2(TexB, Time, TexB);
 				Sub2(TexC, Time, TexC);
-				SetTexCoordToList((u32*)KokiriForestwater_bin, j	 , TexA);
+			//	if (TexA[0] < 0) TexA[0] = 4096;
+			//	if (TexA[1] < 0) TexA[1] = 4096;
+			//	if (TexB[0] < 0) TexB[0] = 4096;
+			//	if (TexB[1] < 0) TexB[1] = 4096;
+			//	if (TexC[0] < 0) TexC[0] = 4096;
+			//	if (TexC[1] < 0) TexC[1] = 4096;
+
+				SetTexCoordToList((u32*)KokiriForestwater_bin, j	, TexA);
 				SetTexCoordToList((u32*)KokiriForestwater_bin, j + 1, TexB);
 				SetTexCoordToList((u32*)KokiriForestwater_bin, j + 2, TexC);
 			//	if (SphereRayVsTriangle(Pos, Radius, RayDir, TriScale, &A, &B, &C, Normal, Dist)) return 34;

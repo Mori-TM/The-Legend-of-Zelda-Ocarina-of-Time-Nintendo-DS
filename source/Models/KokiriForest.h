@@ -133,7 +133,7 @@ void KokiriForestLoadTextures()
 }
 void KokiriForestDraw()
 {
-//	glPolyFmt(2031745);
+	glPolyFmt(2031745);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[0]);
 	glCallList((u32*)KokiriForestgrass_bin);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[1]);

@@ -190,12 +190,15 @@ void PlayerGroundCollision()
 	
 	vec3 Pos; Copy3(PlayerPos, Pos);
 	Pos[1] += F1;//2548;
+	vec3 T = { F2, F2, F2 };
+	Div3(Pos, T, Pos);
 
 	vec3 Normal = { 0, 0, 0};
 	vec3 Dir = { 0, -F1, 0 };
 	f32 Dist = F100;
 	
-	s8 Collision = ProccessCollision((u8*)KokiriForestCollision_bin, Pos, Dir, F200, Normal, &Dist);
+	s8 Collision = ProccessCollision((u8*)KokiriForestCollision_bin, Pos, Dir, F100, Normal, &Dist);//F200
+	Mul3(Pos, T, Pos);
 //	if (Normal[1] <= 1229)
 //		return;
 //	int Collision = KokiriForestGroundCollision(Pos, Radius, Dir, F100, Normal, &Dist);
@@ -224,11 +227,11 @@ void PlayerGroundCollision()
 		printf("\x1b[14;2H Collis Nor: %d.%d %d.%d %d.%d", Normal[0] >> SHIFT_AMOUNT, Normal[0] & SHIFT_MASK, Normal[1] >> SHIFT_AMOUNT, Normal[1] & SHIFT_MASK, Normal[2] >> SHIFT_AMOUNT, Normal[2] & SHIFT_MASK);
 		printf("\x1b[20;2H Collision Index: %d", Collision);
 		
-		if (Dist < PlayerHitboxSize)
+		if (Mul(Dist, T[0]) < PlayerHitboxSize)
 		{
 			PlayerVelocity = F0;
 			PlayerOnGround = true;
-			PlayerPos[1] -= Dist - F1;
+			PlayerPos[1] -= Mul(Dist, T[0]) - F1;
 		}			
 		else
 			PlayerOnGround = false;
