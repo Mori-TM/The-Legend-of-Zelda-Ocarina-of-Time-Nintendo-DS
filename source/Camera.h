@@ -227,11 +227,12 @@ void PlayerGroundCollision()
 		printf("\x1b[14;2H Collis Nor: %d.%d %d.%d %d.%d", Normal[0] >> SHIFT_AMOUNT, Normal[0] & SHIFT_MASK, Normal[1] >> SHIFT_AMOUNT, Normal[1] & SHIFT_MASK, Normal[2] >> SHIFT_AMOUNT, Normal[2] & SHIFT_MASK);
 		printf("\x1b[20;2H Collision Index: %d", Collision);
 		
-		if (Mul(Dist, T[0]) < PlayerHitboxSize)
+		Dist = Mul(Dist, T[0]);
+		if (Dist < PlayerHitboxSize)
 		{
 			PlayerVelocity = F0;
 			PlayerOnGround = true;
-			PlayerPos[1] -= Mul(Dist, T[0]) - F1;
+			PlayerPos[1] -= Dist - F1;
 		}			
 		else
 			PlayerOnGround = false;

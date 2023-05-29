@@ -43,6 +43,7 @@ Infos for me
 -If ramp triangle collision doesn't work 100% just subdived it
 -collision model needs to be half the size of the render model, 
  because collision only uses 16 bit fixed for data storing
+-Use 4/16 color textures too not only 256
 */
 
 //#include "Models/YoungLink.h"
@@ -52,7 +53,7 @@ Infos for me
 int YoungLinkTextures[1];
 void YoungLinkLoadTextures()
 {
-	YoungLinkTextures[0] = LoadTexture(TEXTURE_SIZE_128, (u8*)LinkTex_pcx);
+	YoungLinkTextures[0] = LoadTexture((u8*)LinkTex_pcx);
 }
 
 void YoungLinkDeleteTextures()
@@ -128,7 +129,7 @@ FORCE_INLINE void Display()
 	glPopMatrix(1);
 
 */
-	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT2);
+	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FORMAT_LIGHT0 | POLY_FORMAT_LIGHT1);
 
 	
 
@@ -334,8 +335,6 @@ int main()
 			Normalize3(LightPos);
 
 			RendererSetLight(0, LightColor, LightPos);
-			RendererSetLight(2, LightColor, CameraDir);
-
 			
 			Vec3(-50899, 945, -46252, SrcPos);
 			vec3 Color = { 0, 4096, 0 };

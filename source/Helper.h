@@ -29,21 +29,65 @@ FORCE_INLINE void PenDelta(int *dx, int *dy)
 	}
 }
 
+void GetGLSizeFromNormal(u16* Size)
+{
+	switch (*Size)
+	{
+	case 8:
+		*Size = 0;
+		break;
+	
+	case 16:
+		*Size = 1;
+		break;
+
+	case 32:
+		*Size = 2;
+		break;
+
+	case 64:
+		*Size = 3;
+		break;
+
+	case 128:
+		*Size = 4;
+		break;
+
+	case 256:
+		*Size = 5;
+		break;
+
+	case 512:
+		*Size = 6;
+		break;
+
+	case 1024:
+		*Size = 7;
+		break;
+	
+	default:
+		*Size = 0;
+		break;
+	}
+}
+
 bool LoadAlpha = false;
 bool LoadMirrored = false;
-int LoadTexture(int Size, u8* Image)
+int LoadTexture(u8* Image)
 {
 	int Texture;
 	
-	sImage pcx;
-	loadPCX((u8*)Image, &pcx);
-	if (LoadAlpha)
-		image8to16trans(&pcx, 0);
-	else
-		image8to16(&pcx);
+	sImage PCX;
+	loadPCX((u8*)Image, &PCX);
+	PCXHeader* Header = (PCXHeader*)(Image);
 	
 	glGenTextures(1, &Texture);
 	glBindTexture(0, Texture);
+
+	u16 Width = Header->xmax - Header->xmin + 1;
+	u16 Height = Header->ymax - Header->ymin + 1;
+	GetGLSizeFromNormal(&Width);
+	GetGLSizeFromNormal(&Height);
 
 	int Para;
 	if (LoadMirrored)
@@ -53,10 +97,12 @@ int LoadTexture(int Size, u8* Image)
 		
 
 	if (LoadAlpha)
-		glTexImage2D(0, 0, GL_RGBA, Size, Size, 0, Para, pcx.image.data8);
+		glTexImage2D(0, 0, GL_RGB256, Width, Height, 0, Para | GL_TEXTURE_COLOR0_TRANSPARENT, PCX.image.data8);
 	else
-		glTexImage2D(0, 0, GL_RGB, Size, Size, 0, Para, pcx.image.data8);
-	imageDestroy(&pcx);
+		glTexImage2D(0, 0, GL_RGB256, Width, Height, 0, Para, PCX.image.data8);
+	
+	glColorTableEXT( 0, 0, 256, 0, 0, PCX.palette);
+	imageDestroy(&PCX);
 
 	LoadAlpha = false;
 	LoadMirrored = false;

@@ -11,7 +11,26 @@
         "helper.h": "c",
         "camera.h": "c",
         "fixed.h": "c",
-        "renderer.h": "c"
+        "renderer.h": "c",
+        "kokiriforest.h": "c",
+        "kokiriforestbushside_bin.h": "c",
+        "displaylist.h": "c",
+        "glfixed.h": "c",
+        "link_bin.h": "c",
+        "linktex_pcx.h": "c",
+        "stdio.h": "c",
+        "time.h": "c",
+        "maxmod9.h": "c",
+        "pcx.h": "c",
+        "image.h": "c",
+        "audio.h": "c",
+        "exceptions.h": "c",
+        "decompress.h": "c",
+        "card.h": "c",
+        "kokiriforestbark_bin.h": "c",
+        "math.h": "c",
+        "aes.h": "c",
+        "serial.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
