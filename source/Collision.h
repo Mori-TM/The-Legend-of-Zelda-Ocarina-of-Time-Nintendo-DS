@@ -28,21 +28,27 @@ bool IntersectRayTriangle(f32* ray_origin, f32* ray_direction, f32* v0, f32* v1,
 	return false;
 	*/
 	//const float Eps = FLT_EPSILON;
+	REG_DIVCNT = DIV_64_32;
 	const f32 EPSILON = 1;
 	vec3 e1; Sub3(v1, v0, e1);
 	vec3 e2; Sub3(v2, v0, e2);  
 	vec3 h;  Cross3(ray_direction, e2, h); 
+	
 	f32 a = Dot3(e1, h);
 	if ((a == -F0) || (a == F0)) return false;
+	while(REG_DIVCNT & DIV_BUSY);
+	REG_DIV_NUMER = ((int64)F1) << 12;
+	REG_DIV_DENOM_L = a;
 //    if (a > -EPSILON && a < EPSILON) return false;
-	f32 f = Div(F1, a);
+//	f32 f = Div(F1, a);
 	vec3 s; Sub3(ray_origin, v0, s);
-	f32 u = Mul(f, Dot3(s, h));
+	while(REG_DIVCNT & DIV_BUSY);
+	f32 u = Mul(REG_DIV_RESULT_L, Dot3(s, h));
 	if ((u < F0) || (u > F1)) return false;
 	vec3 q; Cross3(s, e1, q);
-	f32 v = Mul(f, Dot3(ray_direction, q));
+	f32 v = Mul(REG_DIV_RESULT_L, Dot3(ray_direction, q));
 	if ((v < F0) || ((v + u) > F1)) return false;
-	f32 t = Mul(f, Dot3(e2, q));
+	f32 t = Mul(REG_DIV_RESULT_L, Dot3(e2, q));
 	if (t <= EPSILON) return FALSE; // line intersection but no ray intersection
 	if (t > EPSILON)
 	{

@@ -37,13 +37,15 @@ To-Do
 -implement wall collision
 -clean up collision mesh
 -remove overlapping triangles in render mesh
--fix wierd alpha texture issue on ds hardware
+-fix wierd alpha texture issue on ds hardware - done!
+-Use 4/16 color textures too not only 256
+-combine texture palettes
 
 Infos for me
 -If ramp triangle collision doesn't work 100% just subdived it
 -collision model needs to be half the size of the render model, 
  because collision only uses 16 bit fixed for data storing
--Use 4/16 color textures too not only 256
+
 */
 
 //#include "Models/YoungLink.h"

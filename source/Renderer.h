@@ -10,11 +10,19 @@ FORCE_INLINE void RendererInit()
 	vramSetBankA(VRAM_A_TEXTURE);
 	vramSetBankB(VRAM_B_TEXTURE);
 //	vramSetBankC(VRAM_C_TEXTURE);
-//	vramSetBankD(VRAM_D_TEXTURE);
-	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
+	vramSetBankD(VRAM_D_TEXTURE);
+	vramSetBankE(VRAM_E_TEX_PALETTE);
+	vramSetBankF(VRAM_F_TEX_PALETTE);
+	vramSetBankG(VRAM_G_TEX_PALETTE);
+//	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT1);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT4);
-	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
+//	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT5);
+//	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT0);
+//	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT1);
+//	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT4);
+//	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
+//	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
 
 	glEnable(GL_ANTIALIAS);
 	glEnable(GL_TEXTURE_2D);
