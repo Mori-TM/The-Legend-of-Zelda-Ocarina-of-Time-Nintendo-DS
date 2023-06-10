@@ -228,8 +228,9 @@ void PollKeyEvents()
 int main() 
 {	
 	RendererInit();
-	
+//	glCutoffDepth(f32tov16(F10));
 //	MiniMapInit();
+	LoadDirect = true;
 	YoungLinkLoadTextures();
 //	TempleofTimeLoadTextures();
 	KokiriForestLoadTextures();

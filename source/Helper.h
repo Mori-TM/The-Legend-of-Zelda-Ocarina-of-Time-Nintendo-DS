@@ -71,16 +71,47 @@ void GetGLSizeFromNormal(u16* Size)
 	}
 }
 
+#include "PCXLoader.h"
+
 bool LoadAlpha = false;
 bool LoadMirrored = false;
+bool LoadDirect = false;
 int LoadTexture(u8* Image)
 {
 	int Texture;
 	
+//	sImage PCX;
+//	loadPCX((u8*)Image, &PCX);
+
 	sImage PCX;
-	loadPCX((u8*)Image, &PCX);
-	PCXHeader* Header = (PCXHeader*)(Image);
+	if (LoadDirect)
+	{
+//	sImage PCX2;
+//	loadPCX((u8*)Image, &PCX2);
+
+
+		u8 Palette;
+		if (!LoadPCX((u8*)Image, &PCX, &Palette))
+		{
+			LoadAlpha = false;
+			LoadMirrored = false;
+			LoadDirect = false;
+			return -1;
+		}
+			
+//		PCX.palette = PCX2.palette;
+	}
+	else
+	{
+		
+		loadPCX((u8*)Image, &PCX);
+	}
 	
+//	LoadDirect = false;
+	PCXHeader* Header = (PCXHeader*)(Image);
+//	if (LoadDirect)
+//		image8to16(&PCX);
+
 	glGenTextures(1, &Texture);
 	glBindTexture(0, Texture);
 
@@ -99,13 +130,17 @@ int LoadTexture(u8* Image)
 	if (LoadAlpha)
 		glTexImage2D(0, 0, GL_RGB256, Width, Height, 0, Para | GL_TEXTURE_COLOR0_TRANSPARENT, PCX.image.data8);
 	else
-		glTexImage2D(0, 0, GL_RGB256, Width, Height, 0, Para, PCX.image.data8);
+		glTexImage2D(0, 0, LoadDirect ? GL_RGB16 : GL_RGB256, Width, Height, 0, Para, PCX.image.data8);
 	
-	glColorTableEXT( 0, 0, 256, 0, 0, PCX.palette);
+	if (!LoadDirect)
+		glColorTableEXT( 0, 0, 256, 0, 0, PCX.palette);
+	else
+		glColorTableEXT( 0, 0, 16, 0, 0, PCX.palette);
 	imageDestroy(&PCX);
 
 	LoadAlpha = false;
 	LoadMirrored = false;
+	LoadDirect = false;
 
 	return Texture;
 }
