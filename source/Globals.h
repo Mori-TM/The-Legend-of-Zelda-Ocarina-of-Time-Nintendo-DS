@@ -30,4 +30,6 @@ f32 Ticksf32 = 0;
 #define F50		204800
 #define F90		368640
 #define F100	409600
+#define F191	782336
 #define F200	819200
+#define F255	1044480

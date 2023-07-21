@@ -70,6 +70,7 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 */
 
 	unsigned char byte, color, color1, color2;
+	u8* BytePtr;
 	int count, i;
 	int index = 0;
 
@@ -100,7 +101,115 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
         // Similar to 256-color decoding, but with a different run-length encoding scheme
         // Implement the decoding logic for 16-color mode here
 	//	decompress(Data, Pixels, RLE);
-		
+		bool UpperTurn = true;
+		count = 0;
+		while (index < PixelSize/2) 
+		{
+			count++;
+			BytePtr = (Data++);
+			byte = *BytePtr;
+
+			u8 Upper = (byte >> 4) & 0x0F;
+			u8 Lower = byte & 0x0F;
+
+
+
+			if ((Upper & 0xc0) == 0xc0) 
+			{
+                count = Upper & 0x3f;
+			//	color = *(Data++);
+             //   fread(&color, sizeof(unsigned char), 1, inputFile);
+                for (i = 0; i < count; ++i) 
+				{
+                    if (UpperTurn)
+					{
+						UpperTurn = false;
+						Pixels[index] = 0;
+					//	Pixels[index] &= 0x0F;
+					//	Pixels[index] |= ((Lower & 4));
+					//	Pixels[index] = Lower >> 4;
+						Pixels[index] = (Pixels[index] & 0x0F) | ((Lower << 4) & 0xF0);
+					}
+					else
+					{
+					//	Pixels[index] &= 0x0F;
+					//	Pixels[index] |= ((Lower << 4) & 0xF0);
+						Pixels[index] = (Pixels[index] & 0xF0) | (Lower & 0x0F);
+						index++;
+						UpperTurn = true;
+					}
+                }
+            } else 
+			{
+                if (UpperTurn)
+				{
+					UpperTurn = false;
+					Pixels[index] = 0;
+				//	Pixels[index] &= 0x0F;
+				//	Pixels[index] |= ((Lower & 4));
+				//	Pixels[index] = Lower >> 4;
+					Pixels[index] = (Pixels[index] & 0x0F) | ((Upper << 4) & 0xF0);
+				}
+				else
+				{
+				//	Pixels[index] &= 0x0F;
+				//	Pixels[index] |= ((Lower << 4) & 0xF0);
+					Pixels[index] = (Pixels[index] & 0xF0) | (Upper & 0x0F);
+					index++;
+					UpperTurn = true;
+				}
+            }
+
+		//	if (BytePtr[0] == 0x41 &&
+		//		BytePtr[1] == 0x13)
+		//		break;
+		}
+		/*
+		bool UpperTurn = true;
+		count = 0;
+		while (index < PixelSize/2) 
+		{
+			count++;
+			BytePtr = (Data++);
+			byte = *BytePtr;
+
+			u8 Upper = (byte >> 4) & 0x0F;
+			u8 Lower = byte & 0x0F;
+
+			
+
+
+			for (u8 i = 0; i < Upper; i++)
+			{
+				//Pixels[index++]  = Lower;
+				
+				if (UpperTurn)
+				{
+					UpperTurn = false;
+					Pixels[index] = 0;
+				//	Pixels[index] &= 0x0F;
+				//	Pixels[index] |= ((Lower & 4));
+				//	Pixels[index] = Lower >> 4;
+					Pixels[index] = (Pixels[index] & 0x0F) | ((Lower << 4) & 0xF0);
+				}
+				else
+				{
+				//	Pixels[index] &= 0x0F;
+				//	Pixels[index] |= ((Lower << 4) & 0xF0);
+					Pixels[index] = (Pixels[index] & 0xF0) | (Lower & 0x0F);
+					index++;
+					UpperTurn = true;
+				}
+				
+			}
+
+		//	if (BytePtr[0] == 0x41 &&
+		//		BytePtr[1] == 0x13)
+		//		break;
+		}
+		*/
+		printf("Yey: %d\n", count);
+	//	swiDelay(3000);
 		
 	//	memcpy(Pixels, Data, PixelSize / 2);
 	//	Data += PixelSize / 2;
@@ -241,6 +350,9 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
             }
         }
 */
+
+
+/*
 		int scanlineSize = Image->width;
 		int SizeImages = scanlineSize * Image->height;
 		int decompressedIndex = 0;
@@ -265,6 +377,7 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 				break;
 			}
 		}
+		*/
 /*
 		for (int i = 0; i < scanlineSize * (Image->height); i++) 
 		{
@@ -284,14 +397,14 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 			}
 		}
 */
-		index = 0;
-		for (i = 0; i < decompressedIndex; i += 2) 
-		{
-			u8 Upper = Pixels[i];
-			u8 Lower = Pixels[i + 1];
-
-			Pixels[index++] = (Upper << 4) | (Lower & 0x0F);
-		}
+	//	index = 0;
+	//	for (i = 0; i < decompressedIndex; i += 2) 
+	//	{
+	//		u8 Upper = Pixels[i];
+	//		u8 Lower = Pixels[i + 1];
+	//
+	//		Pixels[index++] = (Upper << 4) | (Lower & 0x0F);
+	//	}
 
 	//	for (int i = 0; i < PixelSize; i++) 
 	//	{
@@ -350,7 +463,7 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 				Image->palette = NULL;
 				free(Pixels);
 				printf("16 palette\n");
-				exit(0);
+				exit(0);//just for testing purpose
 				return false;
 			}
 			

@@ -24,9 +24,10 @@
 #include "Models/KokiriForest.h"
 //#include "Models/Sphere.h"
 vec3 PlayerPosLast = { F5, F0, 0 };
+int YoungLinkTextures[1];
 #include "Renderer.h"
 #include "Audio.h"
-//#include "MiniMap.h"
+#include "MiniMap.h"
 #include "Md2Loader.h"
 #include "Collision.h"
 
@@ -52,7 +53,7 @@ Infos for me
 
 #include "Camera.h"
 
-int YoungLinkTextures[1];
+
 void YoungLinkLoadTextures()
 {
 	YoungLinkTextures[0] = LoadTexture((u8*)LinkTex_pcx);
@@ -263,6 +264,8 @@ int main()
 	f32 Time = 0;
 	while (1) 
 	{	
+		MiniMapRender();
+
 		Copy3(PlayerPos, PlayerPosLast);
 		PollKeyEvents();		
 
@@ -319,6 +322,7 @@ int main()
 			printf("\x1b[0;0H Collision Fps: %d, %f", MeasureFps(&CollisionFrame), Test);
 		}
 	//	else
+		if (0 == 1)
 		{
 			glLoadIdentity();
 		
@@ -386,7 +390,7 @@ int main()
 		glPopMatrix(1);
 		*/
 	//	if (RenderMap)
-	//		MiniMapRender();
+			
 		
 	//	RendererDebugInfos();
 	//	printf("\x1b[13;2H Player Col: %.1f %.1f %.1f", Normal[0].Float(), Normal[1].Float(), Normal[2].Float());

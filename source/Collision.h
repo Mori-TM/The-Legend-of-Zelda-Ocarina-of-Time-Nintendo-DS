@@ -209,7 +209,7 @@ s8 ProccessCollision(u8* CollisionMesh, vec3 Pos, vec3 RayDir, f32 TriScale, vec
 	if (Index == -1)
 		return COLLISION_TYPE_NO_AABB;
 	
-	u32* p = CollisionMesh;
+	volatile u32* p = CollisionMesh;
 	u32 f = Header->MeshOffsets[Index].VertexOffset * 2;
 	u32 t = Header->MeshOffsets[Index].VertexCount * 2 + f;
 	

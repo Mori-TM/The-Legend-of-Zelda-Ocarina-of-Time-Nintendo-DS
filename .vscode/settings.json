@@ -31,7 +31,8 @@
         "math.h": "c",
         "aes.h": "c",
         "serial.h": "c",
-        "pcxloader.h": "c"
+        "pcxloader.h": "c",
+        "minimap.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
