@@ -71,6 +71,8 @@
 #include "KokiriForestfade_bin.h"
 #include "Texvinew_pcx.h"
 #include "KokiriForestvinew_bin.h"
+
+//#include "UVGrid_pcx.h"
 int KokiriForestTextures[36];
 void KokiriForestLoadTextures()
 {
@@ -130,6 +132,13 @@ void KokiriForestLoadTextures()
 	KokiriForestTextures[34] = LoadTexture((u8*)Texfade_pcx);
 	LoadAlpha = true;
 	KokiriForestTextures[35] = LoadTexture((u8*)Texvinew_pcx);
+	
+	
+//	int Texture = LoadTexture((u8*)UVGrid_pcx);
+//	for (int i = 0; i < 36; i++)
+//	{
+//		KokiriForestTextures[i] = Texture;
+//	}
 }
 void KokiriForestDraw()
 {
@@ -206,8 +215,23 @@ void KokiriForestDraw()
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[32]);
 	glCallList((u32*)KokiriForestvineh_bin);
 	glPolyFmt(983233);
-	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[33]);
-	glCallList((u32*)KokiriForestwater_bin);
+	
+	glMatrixMode(GL_TEXTURE);	
+	glStoreMatrix(0);
+	glTranslatef32(-Ticksf32, -Ticksf32, 0);
+	glMatrixMode(GL_MODELVIEW);	
+	
+	{
+		glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[33]);
+		glCallList((u32*)KokiriForestwater_bin);
+	}
+
+	glMatrixMode(GL_TEXTURE);	
+	glRestoreMatrix(0);
+	glMatrixMode(GL_MODELVIEW);	
+	
+	
+	
 	glPolyFmt(2031745);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[34]);
 	glCallList((u32*)KokiriForestfade_bin);

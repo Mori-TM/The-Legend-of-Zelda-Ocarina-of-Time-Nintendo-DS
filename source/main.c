@@ -56,6 +56,7 @@ Infos for me
 
 void YoungLinkLoadTextures()
 {
+	LoadDirect = true;
 	YoungLinkTextures[0] = LoadTexture((u8*)LinkTex_pcx);
 }
 
@@ -112,12 +113,12 @@ f32 AnimationSpeed = 15319;//3,74
 FORCE_INLINE void Display()
 {	
 	
-	vec3 SrcPos;
-	Vec3(-50899, 945, -46252, SrcPos);
+//	vec3 SrcPos;
+//	Vec3(-50899, 945, -46252, SrcPos);
 
-	glEnable(GL_TEXTURE_2D);
+//	glEnable(GL_TEXTURE_2D);
 
-	glPolyFmt(POLY_ALPHA(25) | POLY_CULL_NONE);
+//	glPolyFmt(POLY_ALPHA(25) | POLY_CULL_NONE);
 
 	
 /*
@@ -231,7 +232,9 @@ int main()
 	RendererInit();
 //	glCutoffDepth(f32tov16(F10));
 //	MiniMapInit();
-	LoadDirect = true;
+	
+	
+	
 	YoungLinkLoadTextures();
 //	TempleofTimeLoadTextures();
 	KokiriForestLoadTextures();
@@ -264,7 +267,7 @@ int main()
 	f32 Time = 0;
 	while (1) 
 	{	
-		MiniMapRender();
+	//	MiniMapRender();
 
 		Copy3(PlayerPos, PlayerPosLast);
 		PollKeyEvents();		
@@ -322,7 +325,7 @@ int main()
 			printf("\x1b[0;0H Collision Fps: %d, %f", MeasureFps(&CollisionFrame), Test);
 		}
 	//	else
-		if (0 == 1)
+	//	if (0 == 1)
 		{
 			glLoadIdentity();
 		
@@ -351,7 +354,8 @@ int main()
 
 			vec2 Time = { 1, 1 };
 			//Vec2f(Mul(DeltaTime, 10), Time);
-
+			
+			/*
 			//animate water
 			for (int j = 0; j < 75; j += 3)
 			{
@@ -378,7 +382,10 @@ int main()
 			}
 
 			printf("\x1b[1;0H Render Fps: %d", MeasureFps(&RenderFrame));
+			*/
 		}
+		
+	
 			
 		/*
 		glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK);
@@ -407,11 +414,17 @@ int main()
 			Frame = 0;
 	//	swiWaitForVBlank();
 	//	consoleClear();		
-
-		Ticks += timerElapsed(0);
+		
+		u16 TimeElapsed = timerElapsed(0);
+		Ticks += TimeElapsed;
 		if (Ticks >= INT32_MAX)
 			Ticks = 0;
-		Ticksf32 = Ticks;
+			
+			
+		Ticksf32 += TimeElapsed * 30;		
+		if (Ticksf32 >= INT32_MAX)
+			Ticksf32 = 0;
+		
 		GetDeltaTime();		
 		
 		printf("\x1b[2;0H Global Fps: %d", MeasureFps(&GlobalFrame));
