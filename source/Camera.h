@@ -28,7 +28,7 @@ short KeyState = 0;
 
 void UpdatePlayer()
 {
-	f32 Speed = Mul(DeltaTime, 5144);//1,5
+	f32 Speed = Mul(DeltaTime, 4144);//5144==1,5
 	vec3 r;
 	Mul3(CameraDir, Vec3f(Speed, r), CameraDir);
 
