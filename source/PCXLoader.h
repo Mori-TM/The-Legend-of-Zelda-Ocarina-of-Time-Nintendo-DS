@@ -11,42 +11,46 @@ typedef enum
 
 //Implementation by GIMP: https://github.com/MichaelMure/gimp-plugins/blob/master/common/file-pcx.c#L558
 //And slightly modified by me
+
+u8 ReadLineCount = 0;
+u8 ReadLineValue = 0;
+
 u8* ReadLine(u8* Data, u8* Buffer, s32 Bytes)
 {
-	static u8 Count = 0;
-	static u8 Value = 0;
-
 	while (Bytes--)
 	{
-		if (Count == 0)
+		if (ReadLineCount == 0)
 		{
-			Value = *(Data++);
-			if (Value < 0xc0)
+			ReadLineValue = *(Data++);
+			if (ReadLineValue < 0xc0)
 			{
-				Count = 1;
+				ReadLineCount = 1;
 			}
 			else
 			{
-				Count = Value - 0xc0;
-				Value = *(Data++);
+				ReadLineCount = ReadLineValue - 0xc0;
+				ReadLineValue = *(Data++);
 			}
 		}
-		Count--;
-		*(Buffer++) = Value;
+		ReadLineCount--;
+		*(Buffer++) = ReadLineValue;
 	}
 
 	return Data;
 }
 
-void Load4BitPCX(u8* Data, s32 Width, s32 Height, u8 *Buffer, u32 Bytes)
+void Load4BitPCX(u8* Data, s32 Width, s32 Height, u8 *Buffer, u32 Bytes, u8* Line)
 {
 	s32 x;
 	s32 y;
 	s32 c;
 	
-	u8* Line = malloc(Bytes);
+	
 	if (!Line)
 		return;
+		
+	ReadLineCount = 0;
+	ReadLineValue = 0;
 
 	for (y = 0; y < Height; Buffer += Width, ++y)
 	{
@@ -58,19 +62,20 @@ void Load4BitPCX(u8* Data, s32 Width, s32 Height, u8 *Buffer, u32 Bytes)
 			Data = ReadLine(Data, Line, Bytes);
 			for (x = 0; x < Width; ++x)
 			{
-				if (Line[x / 8] & (128 >> mod32(x, 8)))
+				if (Line[x / 8] & (128 >> (x % 8)))
 				Buffer[x] += (1 << c);
 			}
 		}
 	}
-
-	free(Line);
 }
 
-bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
+bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType, u16 ChangePalette)
 {
 	if (!Data)
+	{
+		printf("Failed to find texture\n");
 		return false;
+	}
 
 	PCXHeader* Header = (PCXHeader*)Data;
 	Data += sizeof(PCXHeader);
@@ -94,9 +99,10 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 	u8* Pixels = (u8*)malloc(PixelSize);
 
 	if (!Pixels)
+	{
+		printf("Failed to allocate pixels\n");
 		return false;
-
-	Image->image.data8 = Pixels;
+	}		
 
 	u8 Byte;
 	u8 Color;
@@ -126,8 +132,17 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
         break;
         
     case 16: // 16-color
-		Load4BitPCX(Data, Image->width, Image->height, Pixels, Header->bytesPerLine);
-
+	{
+		u8* Line = (u8*)malloc(Header->bytesPerLine);
+		if (!Line)
+		{
+			printf("Failed allocate line\n");
+			free(Pixels);
+			return false;
+		}
+		Load4BitPCX(Data, Image->width, Image->height, Pixels, Header->bytesPerLine, Line);
+		free(Line);
+		
 		Index = 0;
 		i = 0;
 		while (Index < PixelSize)
@@ -139,8 +154,15 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 			Index += 2;
 		}
 		
+		if ( i > PixelSize)
+		{
+			printf("Failed pixel\n");
+			return false;
+		}
+		
 		Pixels = (u8*)realloc(Pixels, i);
         break;
+	}
         
     case 16777216: // True color
 		PixelSize *= 3;
@@ -149,6 +171,8 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 		Data += PixelSize;
         break;
 	}
+	
+	Image->image.data8 = Pixels;
 
 	{
 		u16* Palette;
@@ -156,8 +180,13 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 		{			
 			Palette = (u16*)malloc(256 * sizeof(u16));
 			if (!Palette)
+			{
+				Image->palette = NULL;
+				free(Pixels);
+				
 				return false;
-
+			}
+			
 			while(*(Data++) != 0x0C);
 
 			for (u16 i = 0; i < 256; i++)
@@ -165,8 +194,23 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 				u8 r = *(Data++);				
 				u8 g = *(Data++);
 				u8 b = *(Data++);
-
-				Palette[i] = ARGB16(1, (r >> 3) & 31, (g >> 3) & 31, (b >> 3) & 31);
+				
+				r = (r >> 3) & 31;
+				g = (g >> 3) & 31;
+				b = (b >> 3) & 31;
+				
+				if (ChangePalette > 0)
+				{
+					u8 ur = (r & 0x7C00) >> 10;
+					u8 ug = (g & 0x03E0) >> 5;
+					u8 ub = (b & 0x001F);
+					
+					r = (r + ur) >> 1;
+					g = (g + ug) >> 1;
+					b = (b + ub) >> 1;
+				}
+	
+				Palette[i] = ARGB16(1, r, g, b);
 			}
 		}
 		else
@@ -187,11 +231,32 @@ bool LoadPCX(u8* Data, sImage* Image, u8* PaletteType)
 				u8 r = Header->palette16[i];				
 				u8 g = Header->palette16[i + 1];
 				u8 b = Header->palette16[i + 2];
-
-				Palette[j++] = ARGB16(1, (r >> 3) & 31, (g >> 3) & 31, (b >> 3) & 31);
+				
+				r = (r >> 3) & 31;
+				g = (g >> 3) & 31;
+				b = (b >> 3) & 31;
+				
+				if (ChangePalette > 0)
+				{
+					u16 ub = (ChangePalette & 0x7C00) >> 10;
+					u16 ug = (ChangePalette & 0x03E0) >> 5;
+					u16 ur = (ChangePalette & 0x001F);
+					
+					r = ((u16)r * ur) / 31;
+					g = ((u16)g * ug) / 31;
+					b = ((u16)b * ub) / 31;
+					
+				}
+	
+				Palette[j++] = ARGB16(1, r, g, b);
+				
+			//	Palette[j++] = ARGB16(1, (r >> 3) & 31, (g >> 3) & 31, (b >> 3) & 31);
+			//	Palette[j++] = UINT16_MAX;
 			}
 		}
 
 		Image->palette = (unsigned short*)Palette;
 	}
+	
+	return true;
 }

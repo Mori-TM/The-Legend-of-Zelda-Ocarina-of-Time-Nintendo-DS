@@ -1,19 +1,74 @@
+void FogInitSettings()
+{
+	glEnable(GL_FOG);
+	glFogShift(3);
+//	glFogColor(0,0,0,0);
+	GFX_FOG_COLOR = glGlob->clearColor;
+//	for(int i=0;i<32;i++)
+//		GFX_FOG_TABLE[i] = 0;
+	
+	GFX_FOG_TABLE[0] = 0;
+	GFX_FOG_TABLE[1] = 0;
+	GFX_FOG_TABLE[2] = 0;
+	GFX_FOG_TABLE[3] = 0;
+	GFX_FOG_TABLE[4] = 0;
+	GFX_FOG_TABLE[5] = 0;
+	GFX_FOG_TABLE[6] = 0;
+	GFX_FOG_TABLE[7] = 0;
+	GFX_FOG_TABLE[8] = 0;
+	GFX_FOG_TABLE[9] = 0;
+	GFX_FOG_TABLE[10] = 1;
+	GFX_FOG_TABLE[11] = 7;
+	GFX_FOG_TABLE[12] = 15;
+	GFX_FOG_TABLE[13] = 22;
+	GFX_FOG_TABLE[14] = 35;
+	GFX_FOG_TABLE[15] = 55;
+	GFX_FOG_TABLE[16] = 88;
+	GFX_FOG_TABLE[17] = 108;
+	GFX_FOG_TABLE[18] = 120;
+	GFX_FOG_TABLE[19] = 120;
+	GFX_FOG_TABLE[20] = 120;
+	GFX_FOG_TABLE[21] = 120;
+	GFX_FOG_TABLE[22] = 120;
+	GFX_FOG_TABLE[23] = 120;
+	GFX_FOG_TABLE[24] = 120;
+	GFX_FOG_TABLE[25] = 121;
+	GFX_FOG_TABLE[26] = 122;
+	GFX_FOG_TABLE[27] = 123;
+	GFX_FOG_TABLE[28] = 124;
+	GFX_FOG_TABLE[29] = 125;
+	GFX_FOG_TABLE[30] = 126;
+	GFX_FOG_TABLE[31] = 127;
+	
+	for(int i=20;i<32;i++)
+		glFogDensity(i,127);
+	int StartFog = 0;
+//	for(int i=0;i<32-StartFog;i++)
+//		glFogDensity(i + StartFog,(i*4));
+//	glFogDensity(31,127);
+	glFogOffset(30550);//Less more fog	
+}
+
 FORCE_INLINE void RendererInit()
 {
 	videoSetMode(MODE_0_3D);
 	glInit();
 
-	consoleDebugInit(DebugDevice_NOCASH);
-	consoleInit(NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
-	consoleDemoInit();
+//	consoleDebugInit(DebugDevice_NOCASH);
+//	consoleInit(NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
+//	consoleDemoInit();
 
 	vramSetBankA(VRAM_A_TEXTURE);
 	vramSetBankB(VRAM_B_TEXTURE);
 //	vramSetBankC(VRAM_C_TEXTURE);
 	vramSetBankD(VRAM_D_TEXTURE);
-	vramSetBankE(VRAM_E_TEX_PALETTE);
-	vramSetBankF(VRAM_F_TEX_PALETTE);
-	vramSetBankG(VRAM_G_TEX_PALETTE);
+		vramSetBankE(VRAM_E_TEX_PALETTE);
+		vramSetBankF(VRAM_F_TEX_PALETTE);
+		vramSetBankG(VRAM_G_TEX_PALETTE);
+	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
+	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
+//	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
+//	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT1);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT4);
@@ -28,12 +83,13 @@ FORCE_INLINE void RendererInit()
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_POLY_OVERFLOW);
 	glEnable(GL_BLEND);
-
+	
+//	GFX_CLEAR_COLOR = glGlob->clearColor = ( glGlob->clearColor & 0xFFE08000) | (0x7FFF & ARGB16_256(1,200,190,135)) | ((31 & 0x1F) << 16);
 	GFX_CLEAR_COLOR = glGlob->clearColor = ( glGlob->clearColor & 0xFFE08000) | (0x7FFF & 0x3A9C) | ((31 & 0x1F) << 16);
 //	glClearColor(, 31);
 	glClearPolyID(63);
 	glClearDepth(0x7FFF);
-
+	
 	glViewport(0, 0, 255, 191);
 //	glLight(0, RGB15(31, 0, 0), 0, floattov10(-1.0f), 0);
 //	glLight(1, RGB15(0, 31, 0), floattov10(1.0f), 0, 0);
@@ -46,6 +102,8 @@ FORCE_INLINE void RendererInit()
 	glMaterialShinyness();
 
 	glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FORMAT_LIGHT0);
+	
+	FogInitSettings();
 }
 
 FORCE_INLINE void RendererDebugInfos()

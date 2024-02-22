@@ -1,220 +1,187 @@
-#include "KokiriForestCollision_bin.h"
-#include "Texgrass_pcx.h"
-#include "KokiriForestgrass_bin.h"
-#include "Texwall_pcx.h"
-#include "KokiriForestwall_bin.h"
-#include "Textrunks_pcx.h"
-#include "KokiriForesttrunks_bin.h"
-#include "Textrees_pcx.h"
-#include "KokiriForesttrees_bin.h"
-#include "Texcut_pcx.h"
-#include "KokiriForestcut_bin.h"
-#include "Texhouse_pcx.h"
-#include "KokiriForesthouse_bin.h"
-#include "Texbush_pcx.h"
-#include "KokiriForestbush_bin.h"
-#include "Texbushside_pcx.h"
-#include "KokiriForestbushside_bin.h"
-#include "Texwalls_pcx.h"
-#include "KokiriForestwalls_bin.h"
-#include "Texledge_pcx.h"
-#include "KokiriForestledge_bin.h"
-#include "Texbark_pcx.h"
-#include "KokiriForestbark_bin.h"
-#include "Textreetop_pcx.h"
-#include "KokiriForesttreetop_bin.h"
-#include "Texexit_pcx.h"
-#include "KokiriForestexit_bin.h"
-#include "Texsteptop_pcx.h"
-#include "KokiriForeststeptop_bin.h"
-#include "Texstep_pcx.h"
-#include "KokiriForeststep_bin.h"
-#include "Textower_pcx.h"
-#include "KokiriForesttower_bin.h"
-#include "Texenter_pcx.h"
-#include "KokiriForestenter_bin.h"
-#include "Texcurtain_pcx.h"
-#include "KokiriForestcurtain_bin.h"
-#include "Texvine_pcx.h"
-#include "KokiriForestvine_bin.h"
-#include "Texedge_pcx.h"
-#include "KokiriForestedge_bin.h"
-#include "Texporch_pcx.h"
-#include "KokiriForestporch_bin.h"
-#include "Texrail_pcx.h"
-#include "KokiriForestrail_bin.h"
-#include "Texladder_pcx.h"
-#include "KokiriForestladder_bin.h"
-#include "Texshroom_pcx.h"
-#include "KokiriForestshroom_bin.h"
-#include "Texmido_pcx.h"
-#include "KokiriForestmido_bin.h"
-#include "Texsaria_pcx.h"
-#include "KokiriForestsaria_bin.h"
-#include "Texshop_pcx.h"
-#include "KokiriForestshop_bin.h"
-#include "Texawning_pcx.h"
-#include "KokiriForestawning_bin.h"
-#include "Texfence_pcx.h"
-#include "KokiriForestfence_bin.h"
-#include "Texfencew_pcx.h"
-#include "KokiriForestfencew_bin.h"
-#include "Texbridge_pcx.h"
-#include "KokiriForestbridge_bin.h"
-#include "Texleaf_pcx.h"
-#include "KokiriForestleaf_bin.h"
-#include "Texvineh_pcx.h"
-#include "KokiriForestvineh_bin.h"
-#include "Texwater_pcx.h"
-#include "KokiriForestwater_bin.h"
-#include "Texfade_pcx.h"
-#include "KokiriForestfade_bin.h"
-#include "Texvinew_pcx.h"
-#include "KokiriForestvinew_bin.h"
-
-//#include "UVGrid_pcx.h"
-int KokiriForestTextures[36];
+int KokiriForestTextures[35];
 void KokiriForestLoadTextures()
 {
-	KokiriForestTextures[0] = LoadTexture((u8*)Texgrass_pcx);
-	KokiriForestTextures[1] = LoadTexture((u8*)Texwall_pcx);
-	KokiriForestTextures[2] = LoadTexture((u8*)Textrunks_pcx);
+	KokiriForestTextures[0] = LoadTextureFromFile("Texgrass.pcx");
+	KokiriForestTextures[1] = LoadTextureFromFile("Texwall.pcx");
+	ChangePalette = ARGB16_256(1,145,117,77);//ARGB16_256(1, 99, 63, 34);//ARGB16_256(1, 161,148,119);//
+	KokiriForestTextures[2] = LoadTextureFromFile("Textrunks.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[3] = LoadTexture((u8*)Textrees_pcx);
+	ChangePalette = ARGB16_256(1, 38, 80, 30);
+	KokiriForestTextures[3] = LoadTextureFromFile("Textrees.pcx");
 	LoadMirrored = true;
-	KokiriForestTextures[4] = LoadTexture((u8*)Texcut_pcx);
-	KokiriForestTextures[5] = LoadTexture((u8*)Texhouse_pcx);
-	KokiriForestTextures[6] = LoadTexture((u8*)Texbush_pcx);
-	KokiriForestTextures[7] = LoadTexture((u8*)Texbushside_pcx);
-	KokiriForestTextures[8] = LoadTexture((u8*)Texwalls_pcx);
-	KokiriForestTextures[9] = LoadTexture((u8*)Texledge_pcx);
-	KokiriForestTextures[10] = LoadTexture((u8*)Texbark_pcx);
-	LoadMirrored = true;
-	LoadAlpha = true;
-	KokiriForestTextures[11] = LoadTexture((u8*)Textreetop_pcx);
-	KokiriForestTextures[12] = LoadTexture((u8*)Texexit_pcx);
-	LoadMirrored = true;
-	KokiriForestTextures[13] = LoadTexture((u8*)Texsteptop_pcx);
-	KokiriForestTextures[14] = LoadTexture((u8*)Texstep_pcx);
-	KokiriForestTextures[15] = LoadTexture((u8*)Textower_pcx);
-	KokiriForestTextures[16] = LoadTexture((u8*)Texenter_pcx);
-	LoadAlpha = true;
-	KokiriForestTextures[17] = LoadTexture((u8*)Texcurtain_pcx);
-	LoadAlpha = true;
-	KokiriForestTextures[18] = LoadTexture((u8*)Texvine_pcx);
-	LoadAlpha = true;
-	KokiriForestTextures[19] = LoadTexture((u8*)Texedge_pcx);
-	LoadMirrored = true;
-	KokiriForestTextures[20] = LoadTexture((u8*)Texporch_pcx);
-	LoadAlpha = true;
-	KokiriForestTextures[21] = LoadTexture((u8*)Texrail_pcx);
+	KokiriForestTextures[4] = LoadTextureFromFile("Texcut.pcx");
+	KokiriForestTextures[5] = LoadTextureFromFile("Texhouse.pcx");
+	KokiriForestTextures[6] = LoadTextureFromFile("Texbush.pcx");
+	KokiriForestTextures[7] = LoadTextureFromFile("Texbushside.pcx");
+	KokiriForestTextures[8] = LoadTextureFromFile("Texwalls.pcx");
+	KokiriForestTextures[9] = LoadTextureFromFile("Texledge.pcx");
+	KokiriForestTextures[10] = LoadTextureFromFile("Texbark.pcx");
 	LoadMirrored = true;
 	LoadAlpha = true;
-	KokiriForestTextures[22] = LoadTexture((u8*)Texladder_pcx);
+	KokiriForestTextures[11] = LoadTextureFromFile("Textreetop.pcx");
+	KokiriForestTextures[12] = LoadTextureFromFile("Texexit.pcx");
+	LoadMirrored = true;
+	KokiriForestTextures[13] = LoadTextureFromFile("Texsteptop.pcx");
+	KokiriForestTextures[14] = LoadTextureFromFile("Texstep.pcx");
+	LoadMirrored = true;
+	KokiriForestTextures[15] = LoadTextureFromFile("Textower.pcx");
+	KokiriForestTextures[16] = LoadTextureFromFile("Texenter.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[23] = LoadTexture((u8*)Texshroom_pcx);
-	KokiriForestTextures[24] = LoadTexture((u8*)Texmido_pcx);
-	KokiriForestTextures[25] = LoadTexture((u8*)Texsaria_pcx);
-	KokiriForestTextures[26] = LoadTexture((u8*)Texshop_pcx);
-	KokiriForestTextures[27] = LoadTexture((u8*)Texawning_pcx);
+	KokiriForestTextures[17] = LoadTextureFromFile("Texcurtain.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[28] = LoadTexture((u8*)Texfence_pcx);
+	KokiriForestTextures[18] = LoadTextureFromFile("Texvine.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[29] = LoadTexture((u8*)Texfencew_pcx);
+	KokiriForestTextures[19] = LoadTextureFromFile("Texedge.pcx");
+	LoadMirrored = true;
+	KokiriForestTextures[20] = LoadTextureFromFile("Texporch.pcx");
+	LoadAlpha = true;
+	KokiriForestTextures[21] = LoadTextureFromFile("Texrail.pcx");
 	LoadMirrored = true;
 	LoadAlpha = true;
-	KokiriForestTextures[30] = LoadTexture((u8*)Texbridge_pcx);
+	KokiriForestTextures[22] = LoadTextureFromFile("Texladder.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[31] = LoadTexture((u8*)Texleaf_pcx);
+	KokiriForestTextures[23] = LoadTextureFromFile("Texshroom.pcx");
+	KokiriForestTextures[24] = LoadTextureFromFile("Texmido.pcx");
+	KokiriForestTextures[25] = LoadTextureFromFile("Texsaria.pcx");
+	KokiriForestTextures[26] = LoadTextureFromFile("Texshop.pcx");
+	KokiriForestTextures[27] = LoadTextureFromFile("Texawning.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[32] = LoadTexture((u8*)Texvineh_pcx);
-	KokiriForestTextures[33] = LoadTexture((u8*)Texwater_pcx);
-	KokiriForestTextures[34] = LoadTexture((u8*)Texfade_pcx);
+	KokiriForestTextures[28] = LoadTextureFromFile("Texfence.pcx");
 	LoadAlpha = true;
-	KokiriForestTextures[35] = LoadTexture((u8*)Texvinew_pcx);
-	
-	
-//	int Texture = LoadTexture((u8*)UVGrid_pcx);
-//	for (int i = 0; i < 36; i++)
-//	{
-//		KokiriForestTextures[i] = Texture;
-//	}
+	KokiriForestTextures[29] = LoadTextureFromFile("Texfencew.pcx");
+	LoadMirrored = true;
+	LoadAlpha = true;
+	KokiriForestTextures[30] = LoadTextureFromFile("Texbridge.pcx");
+	LoadAlpha = true;
+	KokiriForestTextures[31] = LoadTextureFromFile("Texleaf.pcx");
+	LoadAlpha = true;
+	KokiriForestTextures[32] = LoadTextureFromFile("Texvineh.pcx");
+	KokiriForestTextures[33] = LoadTextureFromFile("Texwater.pcx");
+	LoadAlpha = true;
+	KokiriForestTextures[34] = LoadTextureFromFile("Texvinew.pcx");
+}
+u32* KokiriForestCollisionModel;
+u32* KokiriForestModels[35];
+void KokiriForestLoadModels()
+{
+	KokiriForestCollisionModel = LoadFile("KokiriForestCollision.bin", NULL);
+	KokiriForestModels[0] = LoadFile("KokiriForestgrass.bin", NULL);
+	KokiriForestModels[1] = LoadFile("KokiriForestwall.bin", NULL);
+	KokiriForestModels[2] = LoadFile("KokiriForesttrunks.bin", NULL);
+	KokiriForestModels[3] = LoadFile("KokiriForesttrees.bin", NULL);
+	KokiriForestModels[4] = LoadFile("KokiriForestcut.bin", NULL);
+	KokiriForestModels[5] = LoadFile("KokiriForesthouse.bin", NULL);
+	KokiriForestModels[6] = LoadFile("KokiriForestbush.bin", NULL);
+	KokiriForestModels[7] = LoadFile("KokiriForestbushside.bin", NULL);
+	KokiriForestModels[8] = LoadFile("KokiriForestwalls.bin", NULL);
+	KokiriForestModels[9] = LoadFile("KokiriForestledge.bin", NULL);
+	KokiriForestModels[10] = LoadFile("KokiriForestbark.bin", NULL);
+	KokiriForestModels[11] = LoadFile("KokiriForesttreetop.bin", NULL);
+	KokiriForestModels[12] = LoadFile("KokiriForestexit.bin", NULL);
+	KokiriForestModels[13] = LoadFile("KokiriForeststeptop.bin", NULL);
+	KokiriForestModels[14] = LoadFile("KokiriForeststep.bin", NULL);
+	KokiriForestModels[15] = LoadFile("KokiriForesttower.bin", NULL);
+	KokiriForestModels[16] = LoadFile("KokiriForestenter.bin", NULL);
+	KokiriForestModels[17] = LoadFile("KokiriForestcurtain.bin", NULL);
+	KokiriForestModels[18] = LoadFile("KokiriForestvine.bin", NULL);
+	KokiriForestModels[19] = LoadFile("KokiriForestedge.bin", NULL);
+	KokiriForestModels[20] = LoadFile("KokiriForestporch.bin", NULL);
+	KokiriForestModels[21] = LoadFile("KokiriForestrail.bin", NULL);
+	KokiriForestModels[22] = LoadFile("KokiriForestladder.bin", NULL);
+	KokiriForestModels[23] = LoadFile("KokiriForestshroom.bin", NULL);
+	KokiriForestModels[24] = LoadFile("KokiriForestmido.bin", NULL);
+	KokiriForestModels[25] = LoadFile("KokiriForestsaria.bin", NULL);
+	KokiriForestModels[26] = LoadFile("KokiriForestshop.bin", NULL);
+	KokiriForestModels[27] = LoadFile("KokiriForestawning.bin", NULL);
+	KokiriForestModels[28] = LoadFile("KokiriForestfence.bin", NULL);
+	KokiriForestModels[29] = LoadFile("KokiriForestfencew.bin", NULL);
+	KokiriForestModels[30] = LoadFile("KokiriForestbridge.bin", NULL);
+	KokiriForestModels[31] = LoadFile("KokiriForestleaf.bin", NULL);
+	KokiriForestModels[32] = LoadFile("KokiriForestvineh.bin", NULL);
+	KokiriForestModels[33] = LoadFile("KokiriForestwater.bin", NULL);
+	KokiriForestModels[34] = LoadFile("KokiriForestvinew.bin", NULL);
 }
 void KokiriForestDraw()
 {
-	glPolyFmt(2031745);
+	glPolyFmt(2031745| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[0]);
-	glCallList((u32*)KokiriForestgrass_bin);
+	glCallList(KokiriForestModels[0]);
+	
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[1]);
-	glCallList((u32*)KokiriForestwall_bin);
+	glCallList(KokiriForestModels[1]);
+	//trunks
+	glMaterialf(GL_AMBIENT, RGB15(28, 28, 28));
+	glMaterialf(GL_DIFFUSE, RGB15(31, 31, 31));
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[2]);
-	glCallList((u32*)KokiriForesttrunks_bin);
+	glCallList(KokiriForestModels[2]);	
+	glMaterialf(GL_AMBIENT, RGB15(1, 1, 1));
+	glMaterialf(GL_DIFFUSE, RGB15(31, 31, 31));
+	
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[3]);
-	glCallList((u32*)KokiriForesttrees_bin);
+	glCallList(KokiriForestModels[3]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[4]);
-	glCallList((u32*)KokiriForestcut_bin);
+	glCallList(KokiriForestModels[4]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[5]);
-	glCallList((u32*)KokiriForesthouse_bin);
+	glCallList(KokiriForestModels[5]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[6]);
-	glCallList((u32*)KokiriForestbush_bin);
+	glCallList(KokiriForestModels[6]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[7]);
-	glCallList((u32*)KokiriForestbushside_bin);
+	glCallList(KokiriForestModels[7]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[8]);
-	glCallList((u32*)KokiriForestwalls_bin);
+	glCallList(KokiriForestModels[8]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[9]);
-	glCallList((u32*)KokiriForestledge_bin);
+	glCallList(KokiriForestModels[9]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[10]);
-	glCallList((u32*)KokiriForestbark_bin);
+	glCallList(KokiriForestModels[10]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[11]);
-	glCallList((u32*)KokiriForesttreetop_bin);
+	glCallList(KokiriForestModels[11]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[12]);
-	glCallList((u32*)KokiriForestexit_bin);
+	glCallList(KokiriForestModels[12]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[13]);
-	glCallList((u32*)KokiriForeststeptop_bin);
+	glCallList(KokiriForestModels[13]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[14]);
-	glCallList((u32*)KokiriForeststep_bin);
+	glCallList(KokiriForestModels[14]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[15]);
-	glCallList((u32*)KokiriForesttower_bin);
+	glCallList(KokiriForestModels[15]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[16]);
-	glCallList((u32*)KokiriForestenter_bin);
+	glCallList(KokiriForestModels[16]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[17]);
-	glCallList((u32*)KokiriForestcurtain_bin);
-	glPolyFmt(2031809);
+	glCallList(KokiriForestModels[17]);
+	glPolyFmt(2031809| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[18]);
-	glCallList((u32*)KokiriForestvine_bin);
-	glPolyFmt(2031745);
+	glCallList(KokiriForestModels[18]);
+	glPolyFmt(2031745| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[19]);
-	glCallList((u32*)KokiriForestedge_bin);
+	glCallList(KokiriForestModels[19]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[20]);
-	glCallList((u32*)KokiriForestporch_bin);
+	glCallList(KokiriForestModels[20]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[21]);
-	glCallList((u32*)KokiriForestrail_bin);
-	glPolyFmt(2031809);
+	glCallList(KokiriForestModels[21]);
+	glPolyFmt(2031809| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[22]);
-	glCallList((u32*)KokiriForestladder_bin);
-	glPolyFmt(2031745);
+	glCallList(KokiriForestModels[22]);
+	glPolyFmt(2031745| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[23]);
-	glCallList((u32*)KokiriForestshroom_bin);
+	glCallList(KokiriForestModels[23]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[24]);
-	glCallList((u32*)KokiriForestmido_bin);
+	glCallList(KokiriForestModels[24]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[25]);
-	glCallList((u32*)KokiriForestsaria_bin);
+	glCallList(KokiriForestModels[25]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[26]);
-	glCallList((u32*)KokiriForestshop_bin);
+	glCallList(KokiriForestModels[26]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[27]);
-	glCallList((u32*)KokiriForestawning_bin);
-	glPolyFmt(2031809);
+	glCallList(KokiriForestModels[27]);
+	glPolyFmt(2031809| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[28]);
-	glCallList((u32*)KokiriForestfence_bin);
+	glCallList(KokiriForestModels[28]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[29]);
-	glCallList((u32*)KokiriForestfencew_bin);
+	glCallList(KokiriForestModels[29]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[30]);
-	glCallList((u32*)KokiriForestbridge_bin);
+	glCallList(KokiriForestModels[30]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[31]);
-	glCallList((u32*)KokiriForestleaf_bin);
+	glCallList(KokiriForestModels[31]);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[32]);
-	glCallList((u32*)KokiriForestvineh_bin);
-	glPolyFmt(983233);
+	glCallList(KokiriForestModels[32]);
 	
 	glMatrixMode(GL_TEXTURE);	
 	glStoreMatrix(0);
@@ -222,24 +189,63 @@ void KokiriForestDraw()
 	glMatrixMode(GL_MODELVIEW);	
 	
 	{
+		glPolyFmt(983233 | POLY_FOG);
 		glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[33]);
-		glCallList((u32*)KokiriForestwater_bin);
+		glCallList(KokiriForestModels[33]);
 	}
 
 	glMatrixMode(GL_TEXTURE);	
 	glRestoreMatrix(0);
-	glMatrixMode(GL_MODELVIEW);	
+	glMatrixMode(GL_MODELVIEW);
 	
-	
-	
-	glPolyFmt(2031745);
+//	glPolyFmt(983233);
+//	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[33]);
+//	glCallList(KokiriForestModels[33]);
+	glPolyFmt(2031809| POLY_FOG);
 	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[34]);
-	glCallList((u32*)KokiriForestfade_bin);
-	glPolyFmt(2031809);
-	glBindTexture(GL_TEXTURE_2D, KokiriForestTextures[35]);
-	glCallList((u32*)KokiriForestvinew_bin);
+	glCallList(KokiriForestModels[34]);
+	
 }
 void KokiriForestDeleteTextures()
 {
-	glDeleteTextures(36, KokiriForestTextures);
+	glDeleteTextures(35, KokiriForestTextures);
+}
+void KokiriForestDeleteModels()
+{
+	free(KokiriForestCollisionModel);
+	free(KokiriForestModels[0]);
+	free(KokiriForestModels[1]);
+	free(KokiriForestModels[2]);
+	free(KokiriForestModels[3]);
+	free(KokiriForestModels[4]);
+	free(KokiriForestModels[5]);
+	free(KokiriForestModels[6]);
+	free(KokiriForestModels[7]);
+	free(KokiriForestModels[8]);
+	free(KokiriForestModels[9]);
+	free(KokiriForestModels[10]);
+	free(KokiriForestModels[11]);
+	free(KokiriForestModels[12]);
+	free(KokiriForestModels[13]);
+	free(KokiriForestModels[14]);
+	free(KokiriForestModels[15]);
+	free(KokiriForestModels[16]);
+	free(KokiriForestModels[17]);
+	free(KokiriForestModels[18]);
+	free(KokiriForestModels[19]);
+	free(KokiriForestModels[20]);
+	free(KokiriForestModels[21]);
+	free(KokiriForestModels[22]);
+	free(KokiriForestModels[23]);
+	free(KokiriForestModels[24]);
+	free(KokiriForestModels[25]);
+	free(KokiriForestModels[26]);
+	free(KokiriForestModels[27]);
+	free(KokiriForestModels[28]);
+	free(KokiriForestModels[29]);
+	free(KokiriForestModels[30]);
+	free(KokiriForestModels[31]);
+	free(KokiriForestModels[32]);
+	free(KokiriForestModels[33]);
+	free(KokiriForestModels[34]);
 }

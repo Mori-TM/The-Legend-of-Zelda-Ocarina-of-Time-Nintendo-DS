@@ -170,8 +170,8 @@ s8 Md2Load(u8* Buffer, u32 FileLength, s32 TexWidth, s32 TexHeight, Md2ModelData
 	STIndices = (STIndex*)&Buffer[Header->OffsetST];
 	for (i = 0; i < Header->NumST; i++)
 	{
-		Model->ST[i][0] = ToF32(STIndices[i].S);
-		Model->ST[i][1] = ToF32(STIndices[i].T);
+		Model->ST[i][0] = ToF32(STIndices[i].S * 2);
+		Model->ST[i][1] = ToF32(STIndices[i].T * 2);
 	}
 
 	TriIndex = (MeshExt*)malloc(Header->NumTris * sizeof(MeshExt));
@@ -275,4 +275,47 @@ void Md2Update(u32 i)
 		Copy2(Md2Proceess.Model->ST[Md2Proceess.Model->TriIndex[i].STIndex[j]], Md2Proceess.TexCoord[j]);
 		Copy3(Md2Proceess.NormalList[Md2Proceess.Model->TriIndex[i].NormalIndex[j]], Md2Proceess.Normal[j]);
 	}
+}
+
+s8 Md2LoadFromFile(const char* FileName, s32 TexWidth, s32 TexHeight, Md2ModelData* Model)
+{
+	int Length = 0;
+	char* Buffer = LoadFile(FileName, &Length);
+	if (!Buffer)
+		return 0;
+		
+	s8 Success = Md2Load(Buffer, Length, TexWidth, TexHeight, Model);
+		
+	free(Buffer);
+	
+	return Success;
+/*
+	FILE* File = fopen(FileName, "rb");
+	if (File)
+	{
+		fseek(File, 0, SEEK_END);
+		int Length = ftell(File);
+		fseek(File, 0, SEEK_SET);
+
+		char* Buffer = (char*)malloc(Length + 1);
+		if (!Buffer)
+			return 0;
+			
+		if (fread(Buffer, 1, Length, File) != Length)
+			printf("Failed reading: %s\n", FileName);
+			
+		Buffer[Length] = 0;
+		printf("Length: %d\n", Length);
+	//	while (1);
+		s8 Success = Md2Load(Buffer, Length, TexWidth, TexHeight, Model);
+		
+		free(Buffer);
+
+		fclose(File);
+		return Success;
+	}
+	
+	printf("Failed to Load: %s\n", FileName);
+	return 0;
+	*/
 }

@@ -37,6 +37,13 @@ FORCE_INLINE f32 cosf32(f32 Ane)
 //	return (s32)cosLer((short)(Ane.Float() * DEGREES_IN_CIRCLE / 360));
 }
 
+FORCE_INLINE f32 tanf32(f32 Ane)
+{
+	return tanLerp((short)(Div(Mul(Ane, DEGREES_IN_CIRCLEF32), FULL_360F32)));
+//	return (s32)cosLer((short)(Ane * f32((float)DEGREES_IN_CIRCLE) / f32(360.0f)));
+//	return (s32)cosLer((short)(Ane.Float() * DEGREES_IN_CIRCLE / 360));
+}
+
 FORCE_INLINE f32 asinf32(f32 Ane)
 {
 	return asinLerp((short)(Div(Mul(Ane, DEGREES_IN_CIRCLEF32), FULL_360F32)));
@@ -45,15 +52,45 @@ FORCE_INLINE f32 asinf32(f32 Ane)
 FORCE_INLINE f32 acosf32(f32 Ane)
 {
 	
-	return Mul(acosLerp((short)Ane), DEGREES_IN_CIRCLEF32);
+//	return Mul(acosLerp((short)Ane), DEGREES_IN_CIRCLEF32);
+	return acosLerp((short)(Div(Mul(Ane, DEGREES_IN_CIRCLEF32), FULL_360F32)));
+}
+
+FORCE_INLINE f32 atanf32(f32 Ane)
+{
+	f32 v = Div(asinf32(Ane), acosf32(Ane));
+	return v;
 }
 
 #define TO_DEGREES 234684
-
+/*
 FORCE_INLINE f32 atan2f32(f32 x, f32 y)
 {
 	f32 v = Div(asinf32(x), acosf32(y));
 	return Mul(v, TO_DEGREES);
+}
+*/
+f32 atan2f32(f32 y, f32 x) {
+    // Check for special cases
+    if (x > 0) {
+        return atanf32(Div(y, x));
+    } else if (x < 0) {
+        if (y >= 0) {
+            return atanf32(Div(y, x)) + PI;
+        } else {
+            return atanf32(Div(y, x)) - PI;
+        }
+    } else { // x is zero
+        if (y > 0) {
+            return Div(PI, 2);
+        } else if (y < 0) {
+            return -Div(PI, 2);
+        } else { // both x and y are zero
+            // Undefined. You may choose to return an error code or handle it differently.
+            // In this case, I'll return NaN (Not a Number).
+            return 0;
+        }
+    }
 }
 
 /*

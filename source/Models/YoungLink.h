@@ -10448,7 +10448,7 @@ u32 YoungLink[] =
 int YoungLinkTextures[1];
 void YoungLinkLoadTextures()
 {
-	YoungLinkTextures[0] = LoadTexture(TEXTURE_SIZE_128, (u8*)LinkTex_pcx);
+	YoungLinkTextures[0] = LoadTexture((u8*)LinkTex_pcx);
 }
 
 void YoungLinkDraw()

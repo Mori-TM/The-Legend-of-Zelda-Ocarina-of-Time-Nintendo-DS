@@ -87,3 +87,26 @@ void SetVertexToList(u32* List, u32 Index, vec3 Pos)
 	List[Index] = VERTEX_PACK(f32tov16(Pos[0]), f32tov16(Pos[1]));
 	List[Index + 1] = VERTEX_PACK(f32tov16(Pos[2]), 0);
 }
+
+typedef struct
+{
+	u32 Size;
+	u32 List;
+} DisplayList;
+
+typedef struct
+{
+	u32 VertexCount;
+	u32* Vertices;
+	
+	u32 UVCount;
+	u32* UVs;
+	
+	u32 NormalCount;
+	u32* Normals;
+	
+	
+} DisplayVertex;
+
+DisplayList DisplayListCreate(u32 VertexCount, u32* Vertices)
+{}

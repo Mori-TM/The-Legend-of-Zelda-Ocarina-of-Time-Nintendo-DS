@@ -27,10 +27,11 @@ DATA     := data
 GRAPHICS := gfx
 AUDIO    := audio
 ICON     :=
+#NITRODATA:=	nitrofiles
 
 # specify a directory which contains the nitro filesystem
 # this is relative to the Makefile
-NITRO    :=
+# NITRO    :=
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -49,12 +50,12 @@ LDFLAGS   = -specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project (order is important)
 #---------------------------------------------------------------------------------
-LIBS := -lnds9
+LIBS := -lfilesystem -lfat -lnds9
 
 # automatigically add libraries for NitroFS
-ifneq ($(strip $(NITRO)),)
-LIBS := -lfilesystem -lfat $(LIBS)
-endif
+#ifneq ($(strip $(NITRO)),)
+#LIBS := -lfilesystem -lfat $(LIBS)
+#endif
 # automagically add maxmod library
 ifneq ($(strip $(AUDIO)),)
 LIBS := -lmm9 $(LIBS)
@@ -72,6 +73,7 @@ LIBDIRS := $(LIBNDS) $(PORTLIBS)
 #---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
+export TOPDIR	:=	$(CURDIR)
 
 export OUTPUT := $(CURDIR)/$(TARGET)
 
@@ -82,16 +84,15 @@ export VPATH := $(CURDIR)/$(subst /,,$(dir $(ICON)))\
 
 export DEPSDIR := $(CURDIR)/$(BUILD)
 
+#ifneq ($(strip $(NITRODATA)),)
+#	export NITRO_FILES	:=	$(CURDIR)/$(NITRODATA)
+#endif
+
 CFILES   := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES   := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 PNGFILES := $(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
 BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
-
-# prepare NitroFS directory
-ifneq ($(strip $(NITRO)),)
-  export NITRO_FILES := $(CURDIR)/$(NITRO)
-endif
 
 # get audio list for maxmod
 ifneq ($(strip $(AUDIO)),)
@@ -172,6 +173,7 @@ else
 # main targets
 #---------------------------------------------------------------------------------
 $(OUTPUT).nds: $(OUTPUT).elf $(GAME_ICON)
+#$(OUTPUT).nds: 	$(shell find $(TOPDIR)/$(NITRODATA))
 $(OUTPUT).elf: $(OFILES)
 
 # source files depend on generated headers

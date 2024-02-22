@@ -1,3 +1,5 @@
+#define MINI_MAP_RES floattot16(256.0f)
+
 const u32 MiniMap[] =
 {
 	21,
@@ -5,12 +7,12 @@ const u32 MiniMap[] =
 	GL_QUAD,
 	
 	RGB15(31, 31, 31),
-	TEXTURE_PACK(floattot16(128.0), floattot16(128.0)),
+	TEXTURE_PACK(MINI_MAP_RES, MINI_MAP_RES),
 	VERTEX_PACK(floattov16(0.0), floattov16(0.0)), VERTEX_PACK(0, 0),
 
 	FIFO_COMMAND_PACK(FIFO_COLOR, FIFO_TEX_COORD, FIFO_VERTEX16, FIFO_COLOR),
 	RGB15(31, 31, 31),	
-	TEXTURE_PACK(floattot16(0.0), floattot16(128.0)),
+	TEXTURE_PACK(floattot16(0.0), MINI_MAP_RES),
 	VERTEX_PACK(floattov16(10.0), floattov16(0.0)), VERTEX_PACK(0, 0),
 	RGB15(31, 31, 31),
 
@@ -18,7 +20,7 @@ const u32 MiniMap[] =
 	TEXTURE_PACK(floattot16(0.0), floattot16(0.0)),
 	VERTEX_PACK(floattov16(10.0), floattov16(10.0)), VERTEX_PACK(0, 0),
 	RGB15(31, 31, 31),
-	TEXTURE_PACK(floattot16(128.0), floattot16(0.0)),
+	TEXTURE_PACK(MINI_MAP_RES, floattot16(0.0)),
 
 	FIFO_COMMAND_PACK(FIFO_VERTEX16, FIFO_END, FIFO_NOP, FIFO_NOP),
 	VERTEX_PACK(floattov16(0.0), floattov16(10.0)), VERTEX_PACK(0, 0),

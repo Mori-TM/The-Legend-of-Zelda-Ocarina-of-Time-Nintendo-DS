@@ -183,7 +183,7 @@ void PlayerWallCollision()
 #define SHIFT_AMOUNT 12 // 2^16 = 65536
 #define SHIFT_MASK ((1 << SHIFT_AMOUNT) - 1) 
 
-void PlayerGroundCollision()
+void PlayerGroundCollision(u32* CollisionMesh)
 {	
 	PlayerPos[1] += PlayerVelocity;
 	PlayerVelocity += Mul(PlayerFallSpeed, DeltaTime);
@@ -197,7 +197,7 @@ void PlayerGroundCollision()
 	vec3 Dir = { 0, -F1, 0 };
 	f32 Dist = F100;
 	
-	s8 Collision = ProccessCollision((u8*)KokiriForestCollision_bin, Pos, Dir, F100, Normal, &Dist);//F200
+	s8 Collision = ProccessCollision((u8*)CollisionMesh, Pos, Dir, F100, Normal, &Dist);//F200
 	Mul3(Pos, T, Pos);
 //	if (Normal[1] <= 1229)
 //		return;
@@ -284,17 +284,31 @@ void UpdateCamera()
 	
 	
 //	PlayerWallCollision();
-	PlayerGroundCollision();
+	PlayerGroundCollision(KokiriForestCollisionModel);
 	
 	CameraPos[1] = PlayerPos[1] + ToF32(2.4);
-
+	
+	PlayerCameraDist = GetDistanceVec3(CameraPos, PlayerPos);
+	
+	if (PlayerCameraDist > CameraMaxDist)
+	{
+		vec3 Dir; Sub3(PlayerPos, CameraPos, Dir);
+		Dir[1] = 0;
+		Normalize3(Dir);
+		f32 Speed = Mul(DeltaTime, 4144);//5144==1,5
+		vec3 r;
+		Mul3(Dir, Vec3f(Speed, r), Dir);
+	
+		Add3(CameraPos, Dir, CameraPos);
+	}
+	
 	if (KeyState & KEY_STATE_UP)
 	{
 		PlayerCameraDist = GetDistanceVec3(CameraPos, PlayerPos);
 
 		if (PlayerCameraDist > CameraMaxDist)
 		{
-			Add3(CameraPos, PlayerDir, CameraPos);
+		//	Add3(CameraPos, PlayerDir, CameraPos);
 		//	PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
 		}
 			
@@ -309,8 +323,6 @@ void UpdateCamera()
 		//	PlayerCameraDist = GetDistanceVec3P(&CameraPos, &PlayerPos);
 		}
 	}
-
-	
 	
 	printf("\x1b[12;0H Last Ply Pos: %d %d %d", PlayerPosLast[0], PlayerPosLast[1], PlayerPosLast[2]);
 	printf("\x1b[13;0H Ply Pos: %d %d %d", PlayerPos[0], PlayerPos[1], PlayerPos[2]);
