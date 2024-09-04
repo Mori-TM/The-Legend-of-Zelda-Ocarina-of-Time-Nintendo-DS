@@ -69,6 +69,7 @@ FORCE_INLINE void RendererInit()
 	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
 //	vramSetBankG(VRAM_G_TEX_PALETTE_SLOT5);
+
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT0);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT1);
 //	vramSetBankF(VRAM_F_TEX_PALETTE_SLOT4);
@@ -84,8 +85,8 @@ FORCE_INLINE void RendererInit()
 	glEnable(GL_POLY_OVERFLOW);
 	glEnable(GL_BLEND);
 	
-//	GFX_CLEAR_COLOR = glGlob->clearColor = ( glGlob->clearColor & 0xFFE08000) | (0x7FFF & ARGB16_256(1,200,190,135)) | ((31 & 0x1F) << 16);
-	GFX_CLEAR_COLOR = glGlob->clearColor = ( glGlob->clearColor & 0xFFE08000) | (0x7FFF & 0x3A9C) | ((31 & 0x1F) << 16);
+	GFX_CLEAR_COLOR = glGlob->clearColor = ( glGlob->clearColor & 0xFFE08000) | (0x7FFF & ARGB16_256(1,200,190,135)) | ((31 & 0x1F) << 16);
+//	GFX_CLEAR_COLOR = glGlob->clearColor = ( glGlob->clearColor & 0xFFE08000) | (0x7FFF & 0x3A9C) | ((31 & 0x1F) << 16);
 //	glClearColor(, 31);
 	glClearPolyID(63);
 	glClearDepth(0x7FFF);
@@ -114,8 +115,8 @@ FORCE_INLINE void RendererDebugInfos()
 	glGetInt(GL_GET_VERTEX_RAM_COUNT, &VertexCount);
 	glGetInt(GL_GET_POLYGON_RAM_COUNT, &PolyCount);
 
-	printf("\x1b[1;2H Vertices in Ram: %i/6144", VertexCount);
-	printf("\x1b[2;2H Triangles in Ram: %i/2048", PolyCount);
+	printf("\x1b[9;2H Vertices in Ram: %i/6144", VertexCount);
+	printf("\x1b[10;2H Triangles in Ram: %i/2048", PolyCount);
 //	printf("\x1b[3;2H Light Dir: %.1f %.1f %.1f", LightPos[0].Float(), LightPos[1].Float(), LightPos[2].Float());
 //	printf("\x1b[4;1H Light Color: %.2f %.2f %.2f", LightColor[0].Float(), LightColor[1].Float(), LightColor[2].Float());
 //	printf("\x1b[5;3H Battery: %ld%%", getBatteryLevel());
@@ -131,10 +132,10 @@ FORCE_INLINE void RendererDebugInfos()
 		break;
 	}
 	*/
-	printf("\x1b[8;1H A = chnage scene");
-	printf("\x1b[9;1H B = rotate light");
-	printf("\x1b[10;1H X/Y = add/sub Links");
-	printf("\x1b[11;1H select = map");
+//	printf("\x1b[8;1H A = chnage scene");
+//	printf("\x1b[9;1H B = rotate light");
+//	printf("\x1b[10;1H X/Y = add/sub Links");
+//	printf("\x1b[11;1H select = map");
 
 //	printf("\x1b[12;1H Delta Time: %f", DeltaTime.Float());
 }

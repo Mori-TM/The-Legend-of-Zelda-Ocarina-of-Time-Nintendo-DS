@@ -69,10 +69,20 @@ typedef struct
 	s32 FrameSize;
 	s32 TexWidth;
 	s32 TexHeight;
+	
+	bool HoldFirstAnim;
 	s32 CurrentFrame;
 	s32 NextFrame;
+	
+	s32 CurrentFrameBlend;
+	s32 NextFrameBlend;
+	
+	s32 CurrentFrame2;
+	s32 NextFrame2;
+	
 	f32 Interpol;
 	MeshExt* TriIndex;
+	
 	vec2* ST;
 	vec3* PointList;
 	vec3* NormalList;
@@ -202,14 +212,21 @@ s8 Md2Load(u8* Buffer, u32 FileLength, s32 TexWidth, s32 TexHeight, Md2ModelData
 		GenerateNormals(Header->NumXYZ, Model->PointList, Header->NumTris, TriIndex, Model->NormalList, j);
 	}
 	//	free(Buffer);
+	Model->HoldFirstAnim = false;
 	Model->CurrentFrame = 0;
 	Model->NextFrame = 1;
 	Model->Interpol = F0;
+	
+	Model->CurrentFrameBlend = 0;
+	Model->NextFrameBlend = 1;
+	
+	Model->CurrentFrame2 = -1;
+	Model->NextFrame2 = 1;
 
 	return 1;
 }
 
-void Free(Md2ModelData* Model)
+void Md2Destroy(Md2ModelData* Model)
 {
 	free(Model->TriIndex);
 	free(Model->ST);
@@ -227,6 +244,16 @@ struct
 	vec3* PointList;
 	vec3* NextPointList;
 	vec3* NormalList;
+	
+	vec3* PointListBlend;
+	vec3* NextPointListBlend;
+	vec3* NormalListBlend;
+	
+	vec3* PointList2;
+	vec3* NextPointList2;
+	vec3* NormalList2;
+	
+	bool CurrentlyBlending;
 } Md2Proceess;
 
 void Md2Start(u32 StartFrame, u32 EndFrame)
@@ -253,6 +280,254 @@ void Md2Start(u32 StartFrame, u32 EndFrame)
 	Md2Proceess.NormalList = &Md2Proceess.Model->NormalList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
 }
 
+void Md2StartBlend(u32 FirstStart, u32 FirstEnd, u32 BlendFrames, u32 SecondStart, u32 SecondEnd)
+{
+
+//	if (Md2Proceess.Model->CurrentFrame2 - BlendFrames > SecondStart )
+//	if (Md2Proceess.Model->CurrentFrame2 == -1)
+	if (!Md2Proceess.Model->HoldFirstAnim)
+	{
+		if (FirstStart > Md2Proceess.Model->CurrentFrame)
+			Md2Proceess.Model->CurrentFrame = FirstStart;
+
+		if (Md2Proceess.Model->Interpol >= F1)
+		{
+			Md2Proceess.Model->CurrentFrame++;
+
+			if (Md2Proceess.Model->CurrentFrame >= FirstEnd)
+			{
+				
+				
+			}
+
+			Md2Proceess.Model->NextFrame = Md2Proceess.Model->CurrentFrame + 1;
+
+			if (Md2Proceess.Model->NextFrame >= FirstEnd)
+			{
+				Md2Proceess.Model->NextFrame = FirstStart;
+				Md2Proceess.Model->HoldFirstAnim = true;
+			}
+		}
+
+		Md2Proceess.PointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
+		Md2Proceess.NextPointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->NextFrame];
+		Md2Proceess.NormalList = &Md2Proceess.Model->NormalList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
+		
+		Md2Proceess.CurrentlyBlending = false;
+		Md2Proceess.Model->CurrentFrameBlend = 0;
+	}
+	
+	{
+	
+		if (Md2Proceess.Model->CurrentFrame + BlendFrames >= FirstEnd)
+		{
+			if (SecondStart > Md2Proceess.Model->CurrentFrame2)
+				Md2Proceess.Model->CurrentFrame2 = SecondStart;
+
+			if (Md2Proceess.Model->Interpol >= F1)
+			{
+				Md2Proceess.Model->CurrentFrame2++;
+
+				if (Md2Proceess.Model->CurrentFrame2 >= SecondEnd)
+				{
+				
+								
+					
+					
+				}
+
+				Md2Proceess.Model->NextFrame2 = Md2Proceess.Model->CurrentFrame2 + 1;
+
+				if (Md2Proceess.Model->NextFrame2 >= SecondEnd)
+				{
+				
+					Md2Proceess.Model->NextFrame2 = SecondStart;
+					
+					Md2Proceess.Model->CurrentFrame2 = SecondStart;		
+					Md2Proceess.Model->CurrentFrame = FirstStart;
+					Md2Proceess.Model->NextFrame = FirstStart;
+					
+					Md2Proceess.Model->CurrentFrameBlend = FirstStart;
+					
+					Md2Proceess.Model->HoldFirstAnim = false;
+					
+					
+					Md2Proceess.Model->CurrentFrameBlend = 0;
+					Md2Proceess.CurrentlyBlending = false;
+				}
+			}
+
+			if (Md2Proceess.Model->HoldFirstAnim)
+			{
+				Md2Proceess.PointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame2];
+				Md2Proceess.NextPointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->NextFrame2];
+				Md2Proceess.NormalList = &Md2Proceess.Model->NormalList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame2];
+				Md2Proceess.CurrentlyBlending = false;
+				Md2Proceess.Model->CurrentFrameBlend = 0;
+			}
+			else
+			{
+				Md2Proceess.PointList2 = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame2];
+				Md2Proceess.NextPointList2 = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->NextFrame2];
+				Md2Proceess.NormalList2 = &Md2Proceess.Model->NormalList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame2];
+				Md2Proceess.CurrentlyBlending = true;
+				Md2Proceess.Model->CurrentFrameBlend++;
+			}
+			
+		}
+		else
+		{
+		//	Md2Proceess.Model->CurrentFrame2 = -1;
+		}
+	}
+
+
+	if (Md2Proceess.Model->Interpol >= F1)
+	{
+	
+		Md2Proceess.Model->Interpol = F0;
+		
+	}
+
+//	Md2Start(FirstStart, BlendStart);
+
+/*
+	{
+		if (FirstStart > Md2Proceess.Model->CurrentFrame)
+			Md2Proceess.Model->CurrentFrame = FirstStart;
+
+		if (Md2Proceess.Model->Interpol >= F1)
+		{
+			Md2Proceess.Model->Interpol = F0;
+			Md2Proceess.Model->CurrentFrame++;
+
+			if (Md2Proceess.Model->CurrentFrame >= FirstEnd)
+				Md2Proceess.Model->CurrentFrame = SecondStart;
+
+			if (Md2Proceess.Model->CurrentFrame >= SecondEnd)
+				Md2Proceess.Model->CurrentFrame = FirstStart;
+				
+			
+
+			Md2Proceess.Model->NextFrame = Md2Proceess.Model->CurrentFrame + 1;
+
+			if (Md2Proceess.Model->NextFrame >= FirstEnd)
+				Md2Proceess.Model->NextFrame = SecondStart;
+
+			if (Md2Proceess.Model->NextFrame >= SecondEnd)
+				Md2Proceess.Model->NextFrame = FirstStart;
+		}
+
+		Md2Proceess.PointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
+		Md2Proceess.NextPointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->NextFrame];
+		Md2Proceess.NormalList = &Md2Proceess.Model->NormalList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
+	}
+	*/
+	/*
+	{
+		if (StartFrame > Md2Proceess.Model->CurrentFrame)
+			Md2Proceess.Model->CurrentFrame = StartFrame;
+
+		if (Md2Proceess.Model->Interpol >= F1)
+		{
+			Md2Proceess.Model->Interpol = F0;
+			Md2Proceess.Model->CurrentFrame++;
+
+			if (Md2Proceess.Model->CurrentFrame >= EndFrame)
+				Md2Proceess.Model->CurrentFrame = StartFrame;
+
+			Md2Proceess.Model->NextFrame = Md2Proceess.Model->CurrentFrame + 1;
+
+			if (Md2Proceess.Model->NextFrame >= EndFrame)
+				Md2Proceess.Model->NextFrame = StartFrame;
+		}
+
+		Md2Proceess.PointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
+		Md2Proceess.NextPointList = &Md2Proceess.Model->PointList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->NextFrame];
+		Md2Proceess.NormalList = &Md2Proceess.Model->NormalList[Md2Proceess.Model->NumPoints * Md2Proceess.Model->CurrentFrame];
+	}
+	*/
+}
+
+void Md2UpdateBlend(u32 i, u32 FirstEnd, u32 BlendFrames)
+{
+	vec3* P0;
+	vec3* P1;
+	vec3* P2;
+	vec3* P3;
+	vec3 r;
+	
+	vec3 Step3;
+	f32 Step = Div((Md2Proceess.Model->CurrentFrameBlend * 4096), BlendFrames * 4096);
+	Vec3f(Step, Step3);			
+	
+//	vec3 m;
+//	vec3 n;
+	vec3 Inter = { Md2Proceess.Model->Interpol, Md2Proceess.Model->Interpol, Md2Proceess.Model->Interpol };
+
+	//Blend key frames
+	if (Md2Proceess.CurrentlyBlending)
+	{
+		for (u8 j = 0; j < 3; j++)
+		{
+			P0 = &Md2Proceess.PointList[Md2Proceess.Model->TriIndex[i].MeshIndex[j]];
+			P1 = &Md2Proceess.NextPointList[Md2Proceess.Model->TriIndex[i].MeshIndex[j]];
+
+			P2 = &Md2Proceess.PointList2[Md2Proceess.Model->TriIndex[i].MeshIndex[j]];
+			P3 = &Md2Proceess.NextPointList2[Md2Proceess.Model->TriIndex[i].MeshIndex[j]];
+
+			vec3 V0;
+			Add3(*P0, Mul3(Inter, Sub3(*P1, *P0, r), r), V0);
+			
+			vec3 V1;
+			Add3(*P2, Mul3(Inter, Sub3(*P3, *P2, r), r), V1);
+			
+		//	Vec3f(Div(Md2Proceess.Model->CurrentFrameBlend * 4096, BlendFrames * 4096), t);
+		//	Add3(V0, Mul3(t, Sub3(V1, V0, r), r), Md2Proceess.Vertex[j]);
+			
+			/*
+			Vec3f(BlendFrames * 4096, r);
+			
+			Div3(V0, r, m);
+			Div3(V1, r, n);
+			
+			Vec3f(Md2Proceess.Model->CurrentFrameBlend * 4096, t);
+			Vec3f((BlendFrames - Md2Proceess.Model->CurrentFrameBlend) * 4096, r);
+			
+			Mul3(n, t, V1);
+			Mul3(m, r, V0);
+
+			Add3(V0, V1, Md2Proceess.Vertex[j]);
+			*/
+			
+			
+			Lerp3(V0, V1, Step3, Md2Proceess.Vertex[j]);
+			
+			//Md2Proceess.Vertex[j]
+			
+			Copy2(Md2Proceess.Model->ST[Md2Proceess.Model->TriIndex[i].STIndex[j]], Md2Proceess.TexCoord[j]);
+			Copy3(Md2Proceess.NormalList[Md2Proceess.Model->TriIndex[i].NormalIndex[j]], Md2Proceess.Normal[j]);
+		}
+	}
+	//no Blending
+	else
+	{
+		for (u8 j = 0; j < 3; j++)
+		{
+			P0 = &Md2Proceess.PointList[Md2Proceess.Model->TriIndex[i].MeshIndex[j]];
+			P1 = &Md2Proceess.NextPointList[Md2Proceess.Model->TriIndex[i].MeshIndex[j]];
+
+			Add3(*P0, Mul3(Inter, Sub3(*P1, *P0, r), r), Md2Proceess.Vertex[j]);
+			
+			Copy2(Md2Proceess.Model->ST[Md2Proceess.Model->TriIndex[i].STIndex[j]], Md2Proceess.TexCoord[j]);
+			Copy3(Md2Proceess.NormalList[Md2Proceess.Model->TriIndex[i].NormalIndex[j]], Md2Proceess.Normal[j]);
+		}
+	}
+
+	
+}
+
+
 void Md2End(f32 Percent)
 {
 	Md2Proceess.Model->Interpol += Percent;
@@ -276,6 +551,7 @@ void Md2Update(u32 i)
 		Copy3(Md2Proceess.NormalList[Md2Proceess.Model->TriIndex[i].NormalIndex[j]], Md2Proceess.Normal[j]);
 	}
 }
+
 
 s8 Md2LoadFromFile(const char* FileName, s32 TexWidth, s32 TexHeight, Md2ModelData* Model)
 {

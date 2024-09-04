@@ -1,197 +1,21 @@
-/*
-class f32
-{
-public:
-	s32 Fixed;
-
-	FORCE_INLINE f32()
-	{
-		Fixed = 0;
-	}
-
-	FORCE_INLINE f32(s32 n)
-	{
-		Fixed = n;
-	}
-
-	FORCE_INLINE f32(float n)
-	{
-		Fixed = (s32)(n * 4096.0f);
-	}
-
-	FORCE_INLINE f32(double n)
-	{
-		Fixed = (s32)((float)n * 4096.0f);
-	}
-
-	FORCE_INLINE float Float()
-	{
-		return (float(Fixed) * 0.000244140625f);
-	}
-
-	FORCE_INLINE void operator+=(f32 const& n)
-	{
-		Fixed += n;
-	}
-
-	FORCE_INLINE void operator+=(float const& n)
-	{
-		Fixed += f32(n);
-	}
-
-	FORCE_INLINE void operator-=(f32 const& n)
-	{
-		Fixed -= n;
-	}
-
-	FORCE_INLINE void operator-=(float const& n)
-	{
-		Fixed -= f32(n);
-	}
-
-
-	FORCE_INLINE f32 operator+(f32 const& n)
-	{
-		return Fixed + n;
-	}
-
-	FORCE_INLINE f32 operator+(float const& n)
-	{
-		return Fixed + f32(n);
-	}
-
-	FORCE_INLINE f32 operator-(f32 const& n)
-	{
-		return Fixed - n;
-	}
-
-	FORCE_INLINE f32 operator-(float const& n)
-	{
-		return Fixed - f32(n);
-	}
-
-	//for the ds use hardware assisted math func like mulf32() or divf32()
-
-#ifdef NO_HARDWARE_ACCELERATION
-	FORCE_INLINE void operator*=(f32 const& n)
-	{
-		Fixed = (s32)((s64(Fixed) * s64(n)) >> 12);
-	}
-
-	FORCE_INLINE void operator*=(float const& n)
-	{
-		Fixed = (s32)((s64(Fixed) * s64(f32(n))) >> 12);
-	}
-
-	FORCE_INLINE void operator/=(f32 const& n)
-	{
-		Fixed = (s32)((s64(Fixed) << 12) / s64(n));
-	}
-
-	FORCE_INLINE void operator/=(float const& n)
-	{
-		Fixed = (s32)((s64(Fixed) << 12) / s64(f32(n)));
-	}
-
-
-	FORCE_INLINE f32 operator*(f32 const& n)
-	{
-		return (s32)((s64(Fixed) * s64(n)) >> 12);
-	}
-
-	FORCE_INLINE f32 operator*(float const& n)
-	{
-		return (s32)((s64(Fixed) * s64(f32(n))) >> 12);
-	}
-
-	FORCE_INLINE f32 operator/(f32 const& n)
-	{
-		return (s32)((s64(Fixed) << 12) / s64(n));
-	}
-
-	FORCE_INLINE f32 operator/(float const& n)
-	{
-		return (s32)((s64(Fixed) << 12) / s64(f32(n)));
-	}
-#else
-	FORCE_INLINE void operator*=(f32 const& n)
-	{
-		Fixed = mulf32(Fixed, n);
-	}
-
-	FORCE_INLINE void operator*=(float const& n)
-	{
-		Fixed = mulf32(Fixed, f32(n));
-	}
-
-	FORCE_INLINE void operator/=(f32 const& n)
-	{
-		Fixed = divf32(Fixed, n);
-	}
-
-	FORCE_INLINE void operator/=(float const& n)
-	{
-		Fixed = divf32(Fixed, f32(n));
-	}
-
-
-	FORCE_INLINE f32 operator*(f32 const& n)
-	{
-		return mulf32(Fixed, n);
-	}
-
-	FORCE_INLINE f32 operator*(float const& n)
-	{
-		return mulf32(Fixed, f32(n));
-	}
-
-	FORCE_INLINE f32 operator/(f32 const& n)
-	{
-		return divf32(Fixed, n);
-	}
-
-	FORCE_INLINE f32 operator/(float const& n)
-	{
-		return divf32(Fixed, f32(n));
-	}
-#endif	
-
-	FORCE_INLINE f32 operator-()
-	{
-		return -Fixed;
-	}
-
-	FORCE_INLINE bool operator<(f32 const& n)
-	{
-		return Fixed < n;
-	}
-
-	FORCE_INLINE bool operator<=(f32 const& n)
-	{
-		return Fixed <= n;
-	}
-
-	FORCE_INLINE bool operator>(f32 const& n)
-	{
-		return Fixed > n;
-	}
-
-	FORCE_INLINE bool operator>=(f32 const& n)
-	{
-		return Fixed >= n;
-	}
-
-	FORCE_INLINE bool operator==(f32 const& n)
-	{
-		return Fixed == n;
-	}
-
-	FORCE_INLINE bool operator!=(f32 const& n)
-	{
-		return Fixed != n;
-	}
-};
-*/
+#define F0		0
+#define F1		4096
+#define F2		8192
+#define F3		12288
+#define F4		16384
+#define F5		20480
+#define F6		24576
+#define F8		32768
+#define F9		36864
+#define F10		40960
+#define F20		81920
+#define F31		126976
+#define F50		204800
+#define F90		368640
+#define F100	409600
+#define F191	782336
+#define F200	819200
+#define F255	1044480
 
 typedef s32 f32;
 

@@ -4,6 +4,7 @@ vec3 CameraDir = { 0, 0,-F1 };
 vec3 CameraUp = { 0, F1, 0 };
 
 vec3 PlayerPos = { F5, F0, 0 };
+vec3 PlayerPosLast = { F5, F0, 0 };
 vec3 PlayerDir = { 0, 0,-F1 };
 vec3 PlayerNor = { 0, 0,-F1 };
 f32 PlayerCameraDist = 0;

@@ -82,7 +82,9 @@ main.o: \
  D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/MiniMap.h \
  D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Md2Loader.h \
  D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Collision.h \
- D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Camera.h
+ D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Camera.h \
+ D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Player.h \
+ D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Animation.h
 C:/devkitPro/libnds/include/nds.h:
 C:/devkitPro/libnds/include/nds/libversion.h:
 C:/devkitPro/libnds/include/nds/ndstypes.h:
@@ -167,3 +169,5 @@ D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/MiniMap.h:
 D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Md2Loader.h:
 D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Collision.h:
 D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Camera.h:
+D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Player.h:
+D:/github/the-legend-of-zelda-ocarina-of-time-nintendo-ds/source/Animation.h:

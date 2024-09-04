@@ -49,7 +49,7 @@ FORCE_INLINE void MiniMapRender()
 	glEnable(GL_TEXTURE_2D);
 //	glScalefx(9.6f, 6.2f, 2.0f);
 	glScalefx(F20, F20, F2);
-	glBindTexture(GL_TEXTURE_2D, YoungLinkTextures[0]);
+//	glBindTexture(GL_TEXTURE_2D, MiniMaps[0]);
 	glCallList((u32*)MiniMap);
 	glPopMatrix(1);
 }
